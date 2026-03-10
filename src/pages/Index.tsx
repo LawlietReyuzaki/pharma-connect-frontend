@@ -154,7 +154,7 @@ export default function Index() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-6 rounded-2xl bg-card border border-border hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                className="group p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <s.icon className="w-7 h-7 text-primary" />
