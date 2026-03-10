@@ -87,7 +87,7 @@ export default function Index() {
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary-glow rounded-xl px-7 h-12 text-base">
                   <Link to="/shop"><Pill className="w-4.5 h-4.5 mr-2" /> Shop Medicines</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-pharmacy-dark-foreground/15 text-pharmacy-dark-foreground hover:bg-pharmacy-dark-foreground/5 rounded-xl px-7 h-12 text-base backdrop-blur-sm">
+                <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 rounded-xl px-7 h-12 text-base backdrop-blur-sm">
                   <Link to="/consultation"><Video className="w-4.5 h-4.5 mr-2" /> Book Consultation</Link>
                 </Button>
               </motion.div>
@@ -154,7 +154,7 @@ export default function Index() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-6 rounded-2xl bg-card border border-border hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                className="group p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <s.icon className="w-7 h-7 text-primary" />
