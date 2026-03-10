@@ -28,6 +28,7 @@ export default function Navbar() {
   const [authModal, setAuthModal] = useState<"login" | "register" | "doctor-login" | "admin-login" | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
