@@ -151,6 +151,16 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
+                className="text-pharmacy-dark-foreground/70 hover:text-pharmacy-dark-foreground hover:bg-pharmacy-dark-foreground/5"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                <Sun className="w-5 h-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute w-5 h-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 className="relative text-pharmacy-dark-foreground/70 hover:text-pharmacy-dark-foreground hover:bg-pharmacy-dark-foreground/5"
                 onClick={() => setCartOpen(true)}
               >
