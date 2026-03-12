@@ -23,6 +23,8 @@ interface Message {
   suggested_medicines?: any[];
   needs_doctor?: boolean;
   flagged?: boolean;
+  grounded?: boolean;
+  sources?: { title: string; url: string }[];
 }
 
 interface Session {
@@ -66,7 +68,7 @@ export default function Assistant() {
     }
   }, []);
 
-  const sendMessage = async (text?: string) => {
+  const sendMessage = async (text?: string, useWebSearch = false) => {
     const userMsg = (text || input).trim();
     if (!userMsg || loading) return;
     setInput("");
@@ -74,14 +76,16 @@ export default function Assistant() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat/medical-chat", {
+      // Use web-search endpoint when requested, otherwise standard medical-chat
+      const endpoint = useWebSearch ? "/api/chat/web-search" : "/api/chat/medical-chat";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMsg,
           session_id: sessionId,
           lang,
-          include_wiki: true,
+          include_wiki: !useWebSearch,
           user_id: JSON.parse(localStorage.getItem("user") || "{}").id,
         }),
       });
@@ -95,6 +99,8 @@ export default function Assistant() {
           suggested_medicines: data.medicines,
           needs_doctor: data.needs_doctor,
           flagged: data.flagged,
+          grounded: data.grounded,
+          sources: data.sources,
         },
       ]);
     } catch {
@@ -214,7 +220,7 @@ export default function Assistant() {
         <ChatInput
           input={input}
           setInput={setInput}
-          onSend={() => sendMessage()}
+          onSend={(useWebSearch) => sendMessage(undefined, useWebSearch)}
           loading={loading}
           listening={listening}
           onToggleVoice={toggleVoice}

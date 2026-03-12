@@ -11,6 +11,13 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      "/api": { target: "http://localhost:5000", changeOrigin: true },
+      "/admin": { target: "http://localhost:5000", changeOrigin: true },
+      "/doctor": { target: "http://localhost:5000", changeOrigin: true },
+      "/auth": { target: "http://localhost:5000", changeOrigin: true },
+      "/static": { target: "http://localhost:5000", changeOrigin: true },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
