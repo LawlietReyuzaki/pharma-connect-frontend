@@ -12,6 +12,8 @@ import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatPKR } from "@/lib/api";
+import { DUMMY_PHARMACIES, DUMMY_DOCTORS, DUMMY_REVIEWS } from "@/lib/dummyData";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
 
