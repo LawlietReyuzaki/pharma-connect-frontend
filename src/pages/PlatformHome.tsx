@@ -466,7 +466,7 @@ export default function PlatformHome() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-16 bg-gradient-primary">
+      <section className="py-10 bg-gradient-primary">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-6">
             <div className="text-primary-foreground">
