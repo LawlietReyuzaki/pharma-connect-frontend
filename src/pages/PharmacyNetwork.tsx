@@ -222,10 +222,24 @@ export default function PharmacyNetwork() {
         const res = await fetch(url);
         const data = await res.json();
         const list: PharmacyListItem[] = data.pharmacies || [];
-        setPharmacies((prev) => (append ? [...prev, ...list] : list));
-        setHasMore(list.length >= PAGE_SIZE);
+        if (list.length > 0) {
+          setPharmacies((prev) => (append ? [...prev, ...list] : list));
+          setHasMore(list.length >= PAGE_SIZE);
+        } else {
+          // Fallback to dummy data
+          let dummy = [...DUMMY_PHARMACIES] as PharmacyListItem[];
+          if (q) dummy = dummy.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.city.toLowerCase().includes(q.toLowerCase()));
+          if (city) dummy = dummy.filter(p => p.city === city);
+          setPharmacies(dummy);
+          setHasMore(false);
+        }
       } catch {
-        /* ignore */
+        // Fallback to dummy data
+        let dummy = [...DUMMY_PHARMACIES] as PharmacyListItem[];
+        if (q) dummy = dummy.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.city.toLowerCase().includes(q.toLowerCase()));
+        if (city) dummy = dummy.filter(p => p.city === city);
+        setPharmacies(dummy);
+        setHasMore(false);
       }
       setLoading(false);
     },
