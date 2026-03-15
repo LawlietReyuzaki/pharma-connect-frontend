@@ -242,7 +242,7 @@ export default function PlatformHome() {
   return (
     <div>
       {/* ── Hero ── */}
-      <section className="relative min-h-[92vh] flex items-center bg-gradient-hero overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center bg-gradient-hero overflow-hidden py-12">
         <div className="absolute inset-0">
           <div className="absolute top-10 right-10 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
           <div className="absolute bottom-10 left-10 w-[400px] h-[400px] rounded-full bg-info/6 blur-[100px]" />
