@@ -13,10 +13,8 @@ import { usePharmacy } from "@/contexts/PharmacyContext";
 import { useToast } from "@/hooks/use-toast";
 
 const navLinks = [
-  { to: "/", label: "Pharmacies", icon: Building2 },
-  { to: "/shop", label: "Shop", icon: Pill },
-  { to: "/consultation", label: "Consultation", icon: Video },
-  { to: "/appointments", label: "Appointments", icon: Calendar },
+  { to: "/", label: "Home", icon: Building2 },
+  { to: "/pharmacies", label: "Find Pharmacies", icon: Building2 },
   { to: "/assistant", label: "AI Assistant", icon: Bot },
 ];
 

@@ -7,6 +7,11 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { PharmacyProvider } from "@/contexts/PharmacyContext";
 import Layout from "./components/Layout";
+import PlatformHome from "./pages/PlatformHome";
+import PharmacyNetwork from "./pages/PharmacyNetwork";
+import PharmacyLanding from "./pages/PharmacyLanding";
+import PharmacyRegister from "./pages/PharmacyRegister";
+import PharmacyAdminDashboard from "./pages/PharmacyAdminDashboard";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Consultation from "./pages/Consultation";
@@ -16,10 +21,6 @@ import Admin from "./pages/Admin";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import VideoRoom from "./pages/VideoRoom";
 import NotFound from "./pages/NotFound";
-import PharmacyNetwork from "./pages/PharmacyNetwork";
-import PharmacyLanding from "./pages/PharmacyLanding";
-import PharmacyRegister from "./pages/PharmacyRegister";
-import PharmacyAdminDashboard from "./pages/PharmacyAdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -33,9 +34,10 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                {/* Network-level pages (inside Layout with Navbar) */}
+                {/* Pages inside Layout (with Navbar + Footer) */}
                 <Route element={<Layout />}>
-                  <Route path="/" element={<PharmacyNetwork />} />
+                  <Route path="/" element={<PlatformHome />} />
+                  <Route path="/pharmacies" element={<PharmacyNetwork />} />
                   <Route path="/pharmacy/:slug" element={<PharmacyLanding />} />
                   <Route path="/home" element={<Index />} />
                   <Route path="/shop" element={<Shop />} />
