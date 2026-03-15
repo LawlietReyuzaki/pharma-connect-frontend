@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingBag, Calendar, Stethoscope, Star, MessageSquare,
   Settings, LogOut, Lock, Mail, Menu, X, Users, ChevronRight,
   Plus, Trash2, Check, Reply, Eye, RefreshCw, Building2, Phone, MapPin, Clock,
-  Shield, AlertCircle
+  Shield, AlertCircle, Camera, Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,8 @@ interface Doctor {
   experience_years?: number;
   qualification?: string;
   fee?: number;
+  photo_path?: string;
+  phone?: string;
 }
 
 interface Review {
@@ -218,10 +220,16 @@ export default function PharmacyAdminDashboard() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [chats, setChats] = useState<ChatLog[]>([]);
 
-  const [newDoctor, setNewDoctor] = useState({ name: "", specialization: "", experience_years: "", qualification: "", fee: "" });
+  const [newDoctor, setNewDoctor] = useState({ name: "", email: "", specialization: "", experience_years: "", qualification: "", phone: "" });
   const [replyText, setReplyText] = useState<Record<number, string>>({});
   const [profileForm, setProfileForm] = useState({ phone: "", address: "", operating_hours: "" });
+  const [profilePhotos, setProfilePhotos] = useState<{ owner_photo?: File; pharmacy_photo?: File }>({});
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<{ owner?: string; pharmacy?: string }>({});
+  const [doctorPhotoUploading, setDoctorPhotoUploading] = useState<number | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
+  const ownerPhotoRef = useRef<HTMLInputElement>(null);
+  const pharmacyPhotoRef = useRef<HTMLInputElement>(null);
+  const doctorPhotoRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   const handleLogin = (a: PharmacyAdmin, token: string) => {
     localStorage.setItem("pharmacy_admin_token", token);
@@ -237,6 +245,15 @@ export default function PharmacyAdminDashboard() {
 
   const apiFetch = useCallback(async (url: string, options?: RequestInit) => {
     const res = await fetch(url, { ...options, headers: { ...authHeaders(), ...(options?.headers || {}) } });
+    return res.json();
+  }, []);
+
+  const apiFetchFormData = useCallback(async (url: string, formData: FormData) => {
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${getToken()}` },
+      body: formData,
+    });
     return res.json();
   }, []);
 
@@ -270,6 +287,10 @@ export default function PharmacyAdminDashboard() {
               address: d.pharmacy.address || "",
               operating_hours: d.pharmacy.operating_hours || "",
             });
+            setProfilePhotoPreview({
+              owner: d.pharmacy.owner_photo_path || undefined,
+              pharmacy: d.pharmacy.pharmacy_photo_path || undefined,
+            });
           }
         }
       } catch { /* ignore */ }
@@ -278,26 +299,50 @@ export default function PharmacyAdminDashboard() {
   }, [panel, admin, apiFetch]);
 
   const addDoctor = async () => {
-    if (!newDoctor.name || !newDoctor.specialization) return;
+    if (!newDoctor.name || !newDoctor.specialization || !newDoctor.email) return;
     setLoadingAction(true);
     const data = await apiFetch("/pharmacy-admin/api/doctors", {
       method: "POST",
       body: JSON.stringify({
         name: newDoctor.name,
+        email: newDoctor.email,
         specialization: newDoctor.specialization,
         experience_years: newDoctor.experience_years ? parseInt(newDoctor.experience_years) : undefined,
         qualification: newDoctor.qualification || undefined,
-        fee: newDoctor.fee ? parseFloat(newDoctor.fee) : undefined,
+        phone: newDoctor.phone || undefined,
       }),
     });
     if (data.success) {
       toast({ title: "Doctor added!" });
-      setDoctors((prev) => [data.doctor, ...prev]);
-      setNewDoctor({ name: "", specialization: "", experience_years: "", qualification: "", fee: "" });
+      setDoctors((prev) => [...prev, data.doctor]);
+      setNewDoctor({ name: "", email: "", specialization: "", experience_years: "", qualification: "", phone: "" });
     } else {
-      toast({ title: data.message || "Failed", variant: "destructive" });
+      toast({ title: data.error || data.message || "Failed", variant: "destructive" });
     }
     setLoadingAction(false);
+  };
+
+  const uploadDoctorPhoto = async (doctorId: number, file: File) => {
+    setDoctorPhotoUploading(doctorId);
+    const fd = new FormData();
+    fd.append("photo", file);
+    try {
+      const res = await fetch(`/pharmacy-admin/api/doctors/${doctorId}/photo`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast({ title: "Photo uploaded!" });
+        setDoctors((prev) => prev.map((d) => d.id === doctorId ? { ...d, photo_path: data.photo_path } : d));
+      } else {
+        toast({ title: data.error || "Upload failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    }
+    setDoctorPhotoUploading(null);
   };
 
   const deleteDoctor = async (id: number) => {
@@ -324,12 +369,19 @@ export default function PharmacyAdminDashboard() {
 
   const updateProfile = async () => {
     setLoadingAction(true);
-    const data = await apiFetch("/pharmacy-admin/api/profile", {
-      method: "PUT",
-      body: JSON.stringify(profileForm),
-    });
-    if (data.success) toast({ title: "Profile updated!" });
-    else toast({ title: data.message || "Failed", variant: "destructive" });
+    const fd = new FormData();
+    fd.append("phone", profileForm.phone);
+    fd.append("address", profileForm.address);
+    fd.append("operating_hours", profileForm.operating_hours);
+    if (profilePhotos.owner_photo) fd.append("owner_photo", profilePhotos.owner_photo);
+    if (profilePhotos.pharmacy_photo) fd.append("pharmacy_photo", profilePhotos.pharmacy_photo);
+    const data = await apiFetchFormData("/pharmacy-admin/api/profile", fd);
+    if (data.success) {
+      toast({ title: "Profile updated!" });
+      setProfilePhotos({});
+    } else {
+      toast({ title: data.error || data.message || "Failed", variant: "destructive" });
+    }
     setLoadingAction(false);
   };
 
@@ -527,12 +579,13 @@ export default function PharmacyAdminDashboard() {
                     <h3 className="font-heading font-semibold text-sm mb-4 flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /> Add New Doctor</h3>
                     <div className="grid sm:grid-cols-2 gap-3 mb-3">
                       <div><Label className="text-xs">Name *</Label><Input value={newDoctor.name} onChange={(e) => setNewDoctor((p) => ({ ...p, name: e.target.value }))} placeholder="Dr. Full Name" className="mt-1 h-9 text-sm" /></div>
+                      <div><Label className="text-xs">Email *</Label><Input type="email" value={newDoctor.email} onChange={(e) => setNewDoctor((p) => ({ ...p, email: e.target.value }))} placeholder="doctor@email.com" className="mt-1 h-9 text-sm" /></div>
                       <div><Label className="text-xs">Specialization *</Label><Input value={newDoctor.specialization} onChange={(e) => setNewDoctor((p) => ({ ...p, specialization: e.target.value }))} placeholder="e.g. Cardiologist" className="mt-1 h-9 text-sm" /></div>
                       <div><Label className="text-xs">Qualification</Label><Input value={newDoctor.qualification} onChange={(e) => setNewDoctor((p) => ({ ...p, qualification: e.target.value }))} placeholder="MBBS, FCPS..." className="mt-1 h-9 text-sm" /></div>
                       <div><Label className="text-xs">Experience (years)</Label><Input type="number" value={newDoctor.experience_years} onChange={(e) => setNewDoctor((p) => ({ ...p, experience_years: e.target.value }))} placeholder="5" className="mt-1 h-9 text-sm" /></div>
-                      <div><Label className="text-xs">Fee (PKR)</Label><Input type="number" value={newDoctor.fee} onChange={(e) => setNewDoctor((p) => ({ ...p, fee: e.target.value }))} placeholder="1500" className="mt-1 h-9 text-sm" /></div>
+                      <div><Label className="text-xs">Phone</Label><Input value={newDoctor.phone} onChange={(e) => setNewDoctor((p) => ({ ...p, phone: e.target.value }))} placeholder="03XX-XXXXXXX" className="mt-1 h-9 text-sm" /></div>
                     </div>
-                    <Button onClick={addDoctor} size="sm" disabled={!newDoctor.name || !newDoctor.specialization || loadingAction} className="bg-primary text-primary-foreground rounded-lg gap-2">
+                    <Button onClick={addDoctor} size="sm" disabled={!newDoctor.name || !newDoctor.email || !newDoctor.specialization || loadingAction} className="bg-primary text-primary-foreground rounded-lg gap-2">
                       <Plus className="w-3.5 h-3.5" /> {loadingAction ? "Adding..." : "Add Doctor"}
                     </Button>
                   </div>
@@ -542,14 +595,47 @@ export default function PharmacyAdminDashboard() {
                     <div className="grid sm:grid-cols-2 gap-3">
                       {doctors.map((doc) => (
                         <div key={doc.id} className="bg-card border border-border rounded-2xl p-4 flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">{doc.name.charAt(0)}</div>
+                          {/* Doctor photo with upload overlay */}
+                          <div className="relative shrink-0 group">
+                            {doc.photo_path ? (
+                              <img src={doc.photo_path} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
+                            ) : (
+                              <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">{doc.name.charAt(0)}</div>
+                            )}
+                            <button
+                              onClick={() => doctorPhotoRefs.current[doc.id]?.click()}
+                              className="absolute inset-0 rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                              title="Upload photo"
+                            >
+                              {doctorPhotoUploading === doc.id
+                                ? <RefreshCw className="w-4 h-4 text-white animate-spin" />
+                                : <Camera className="w-4 h-4 text-white" />}
+                            </button>
+                            <input
+                              ref={(el) => { doctorPhotoRefs.current[doc.id] = el; }}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadDoctorPhoto(doc.id, file);
+                                e.target.value = "";
+                              }}
+                            />
+                          </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-heading font-bold text-sm truncate">{doc.name}</p>
                             <p className="text-xs text-primary font-medium">{doc.specialization}</p>
                             {doc.qualification && <p className="text-xs text-muted-foreground">{doc.qualification}</p>}
-                            {doc.fee && <p className="text-xs font-semibold text-primary mt-0.5">{formatPKR(doc.fee)}</p>}
+                            {doc.experience_years && <p className="text-xs text-muted-foreground">{doc.experience_years} yrs exp</p>}
+                            <button
+                              onClick={() => doctorPhotoRefs.current[doc.id]?.click()}
+                              className="mt-1 text-[10px] text-primary/70 hover:text-primary flex items-center gap-1 transition-colors"
+                            >
+                              <Upload className="w-2.5 h-2.5" /> {doc.photo_path ? "Change photo" : "Upload photo"}
+                            </button>
                           </div>
-                          <button onClick={() => deleteDoctor(doc.id)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0">
+                          <button onClick={() => deleteDoctor(doc.id)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0 mt-1">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -626,9 +712,86 @@ export default function PharmacyAdminDashboard() {
 
               {/* Settings */}
               {panel === "settings" && (
-                <div className="max-w-lg">
+                <div className="max-w-2xl">
                   <h2 className="font-heading font-bold text-lg mb-5">Profile Settings</h2>
+
+                  {/* Photo uploads */}
+                  <div className="bg-card border border-border rounded-2xl p-6 mb-5">
+                    <h3 className="font-heading font-semibold text-sm mb-4 flex items-center gap-2"><Camera className="w-4 h-4 text-primary" /> Photos</h3>
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      {/* Pharmacy photo */}
+                      <div>
+                        <Label className="text-xs mb-2 block">Pharmacy Photo</Label>
+                        <div
+                          className="relative w-full h-36 rounded-xl border-2 border-dashed border-border hover:border-primary/50 cursor-pointer overflow-hidden transition-colors group"
+                          onClick={() => pharmacyPhotoRef.current?.click()}
+                        >
+                          {profilePhotoPreview.pharmacy || profilePhotos.pharmacy_photo ? (
+                            <img
+                              src={profilePhotos.pharmacy_photo ? URL.createObjectURL(profilePhotos.pharmacy_photo) : profilePhotoPreview.pharmacy}
+                              alt="Pharmacy"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                              <Building2 className="w-8 h-8 mb-2 opacity-40" />
+                              <span className="text-xs">Click to upload</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Camera className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                        <input ref={pharmacyPhotoRef} type="file" accept="image/*" className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) setProfilePhotos((p) => ({ ...p, pharmacy_photo: f }));
+                          }}
+                        />
+                        {profilePhotos.pharmacy_photo && (
+                          <p className="text-xs text-primary mt-1 truncate">{profilePhotos.pharmacy_photo.name}</p>
+                        )}
+                      </div>
+
+                      {/* Owner photo */}
+                      <div>
+                        <Label className="text-xs mb-2 block">Owner Photo</Label>
+                        <div
+                          className="relative w-full h-36 rounded-xl border-2 border-dashed border-border hover:border-primary/50 cursor-pointer overflow-hidden transition-colors group"
+                          onClick={() => ownerPhotoRef.current?.click()}
+                        >
+                          {profilePhotoPreview.owner || profilePhotos.owner_photo ? (
+                            <img
+                              src={profilePhotos.owner_photo ? URL.createObjectURL(profilePhotos.owner_photo) : profilePhotoPreview.owner}
+                              alt="Owner"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                              <Users className="w-8 h-8 mb-2 opacity-40" />
+                              <span className="text-xs">Click to upload</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Camera className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                        <input ref={ownerPhotoRef} type="file" accept="image/*" className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) setProfilePhotos((p) => ({ ...p, owner_photo: f }));
+                          }}
+                        />
+                        {profilePhotos.owner_photo && (
+                          <p className="text-xs text-primary mt-1 truncate">{profilePhotos.owner_photo.name}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Text fields */}
                   <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+                    <h3 className="font-heading font-semibold text-sm mb-1 flex items-center gap-2"><Settings className="w-4 h-4 text-primary" /> Contact & Hours</h3>
                     <div>
                       <Label>Phone Number</Label>
                       <div className="relative mt-1"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
