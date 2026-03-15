@@ -264,7 +264,7 @@ export default function PlatformHome() {
               <motion.h1
                 variants={fadeUp}
                 custom={1}
-                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-heading font-bold leading-[1.15] mb-6 tracking-tight text-pharmacy-dark-foreground"
+                className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold leading-[1.15] mb-4 tracking-tight text-pharmacy-dark-foreground"
               >
                 Find Trusted{" "}
                 <span className="text-gradient-primary">Pharmacies</span>{" "}
