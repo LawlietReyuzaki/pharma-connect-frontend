@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Search, MapPin, ArrowRight, Star, Building2, Users, ChevronRight,
@@ -198,6 +198,7 @@ function PharmacyCard({
 
 export default function PharmacyNetwork() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { selectPharmacy } = usePharmacy();
 
   const [pharmacies, setPharmacies] = useState<PharmacyListItem[]>([]);
@@ -236,7 +237,11 @@ export default function PharmacyNetwork() {
       .then((r) => r.json())
       .then((d) => setCities(d.cities || []))
       .catch(() => {});
-  }, [loadPharmacies]);
+    // Auto-trigger near me if coming from landing page
+    if (searchParams.get("nearme") === "1") {
+      handleNearMe();
+    }
+  }, [loadPharmacies]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = () => {
     setOffset(0);

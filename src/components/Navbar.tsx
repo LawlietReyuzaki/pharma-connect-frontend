@@ -13,10 +13,8 @@ import { usePharmacy } from "@/contexts/PharmacyContext";
 import { useToast } from "@/hooks/use-toast";
 
 const navLinks = [
-  { to: "/", label: "Pharmacies", icon: Building2 },
-  { to: "/shop", label: "Shop", icon: Pill },
-  { to: "/consultation", label: "Consultation", icon: Video },
-  { to: "/appointments", label: "Appointments", icon: Calendar },
+  { to: "/", label: "Home", icon: Building2 },
+  { to: "/pharmacies", label: "Find Pharmacies", icon: Building2 },
   { to: "/assistant", label: "AI Assistant", icon: Bot },
 ];
 
@@ -124,9 +122,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-primary-glow transition-transform group-hover:scale-105">
-                <span className="text-primary-foreground font-heading font-bold text-sm">
-                  {selectedPharmacy ? selectedPharmacy.name.charAt(0) : "RD"}
-                </span>
+                <span className="text-primary-foreground font-heading font-bold text-sm">PN</span>
               </div>
               <div className="hidden sm:block">
                 {selectedPharmacy ? (
@@ -230,8 +226,11 @@ export default function Navbar() {
                   <Button variant="ghost" size="sm" className="text-pharmacy-dark-foreground/70 hover:text-pharmacy-dark-foreground" onClick={() => setAuthModal("login")}>
                     Login
                   </Button>
+                  <Button asChild variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg">
+                    <Link to="/pharmacy/register">Register Pharmacy</Link>
+                  </Button>
                   <Button size="sm" className="bg-primary text-primary-foreground rounded-lg" onClick={() => setAuthModal("register")}>
-                    Register
+                    Sign Up
                   </Button>
                 </div>
               )}
