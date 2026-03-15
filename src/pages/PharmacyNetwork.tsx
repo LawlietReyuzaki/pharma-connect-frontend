@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
+import { DUMMY_PHARMACIES, DUMMY_CITIES } from "@/lib/dummyData";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
 
