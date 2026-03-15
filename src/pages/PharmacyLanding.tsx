@@ -190,7 +190,7 @@ export default function PharmacyLanding() {
           <Building2 className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
           <h2 className="text-2xl font-heading font-bold mb-2">Pharmacy Not Found</h2>
           <p className="text-muted-foreground mb-6">This pharmacy doesn't exist or has been removed.</p>
-          <Button asChild><Link to="/"><ChevronLeft className="w-4 h-4 mr-1" /> Browse Pharmacies</Link></Button>
+          <Button asChild><Link to="/pharmacies"><ChevronLeft className="w-4 h-4 mr-1" /> Browse Pharmacies</Link></Button>
         </div>
       </div>
     );
