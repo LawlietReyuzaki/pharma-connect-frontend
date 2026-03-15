@@ -198,6 +198,7 @@ function PharmacyCard({
 
 export default function PharmacyNetwork() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { selectPharmacy } = usePharmacy();
 
   const [pharmacies, setPharmacies] = useState<PharmacyListItem[]>([]);
