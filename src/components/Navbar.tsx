@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Shield, Stethoscope, Sun, Moon } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Shield, Stethoscope, Sun, Moon, Building2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { usePharmacy } from "@/contexts/PharmacyContext";
 import { useToast } from "@/hooks/use-toast";
 
 const navLinks = [
-  { to: "/", label: "Home" },
+  { to: "/", label: "Pharmacies", icon: Building2 },
   { to: "/shop", label: "Shop", icon: Pill },
   { to: "/consultation", label: "Consultation", icon: Video },
   { to: "/appointments", label: "Appointments", icon: Calendar },
@@ -23,6 +24,7 @@ export default function Navbar() {
   const { pathname } = useLocation();
   const { user, isAuthenticated, login, register, logout } = useAuth();
   const { totalItems, setIsOpen: setCartOpen } = useCart();
+  const { pharmacy: selectedPharmacy } = usePharmacy();
   const { toast } = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | "doctor-login" | "admin-login" | null>(null);
@@ -122,11 +124,26 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-primary-glow transition-transform group-hover:scale-105">
-                <span className="text-primary-foreground font-heading font-bold text-sm">RD</span>
+                <span className="text-primary-foreground font-heading font-bold text-sm">
+                  {selectedPharmacy ? selectedPharmacy.name.charAt(0) : "RD"}
+                </span>
               </div>
-              <span className="text-pharmacy-dark-foreground font-heading font-bold text-lg hidden sm:block">
-                Red Dot <span className="text-primary">Pharmacy</span>
-              </span>
+              <div className="hidden sm:block">
+                {selectedPharmacy ? (
+                  <div>
+                    <span className="text-pharmacy-dark-foreground font-heading font-bold text-sm leading-none block">
+                      {selectedPharmacy.name}
+                    </span>
+                    <span className="text-pharmacy-dark-foreground/40 text-[10px] leading-none">
+                      {selectedPharmacy.city}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-pharmacy-dark-foreground font-heading font-bold text-lg">
+                    Pharma<span className="text-primary">Network</span>
+                  </span>
+                )}
+              </div>
             </Link>
 
             {/* Desktop Nav */}

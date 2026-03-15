@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { PharmacyProvider } from "@/contexts/PharmacyContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
@@ -15,6 +16,10 @@ import Admin from "./pages/Admin";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import VideoRoom from "./pages/VideoRoom";
 import NotFound from "./pages/NotFound";
+import PharmacyNetwork from "./pages/PharmacyNetwork";
+import PharmacyLanding from "./pages/PharmacyLanding";
+import PharmacyRegister from "./pages/PharmacyRegister";
+import PharmacyAdminDashboard from "./pages/PharmacyAdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -23,23 +28,33 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/consultation" element={<Consultation />} />
-                <Route path="/appointments" element={<Appointments />} />
-                <Route path="/video" element={<VideoRoom />} />
-              </Route>
-              <Route path="/assistant" element={<Assistant />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <PharmacyProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Network-level pages (inside Layout with Navbar) */}
+                <Route element={<Layout />}>
+                  <Route path="/" element={<PharmacyNetwork />} />
+                  <Route path="/pharmacy/:slug" element={<PharmacyLanding />} />
+                  <Route path="/home" element={<Index />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/consultation" element={<Consultation />} />
+                  <Route path="/appointments" element={<Appointments />} />
+                  <Route path="/video" element={<VideoRoom />} />
+                </Route>
+
+                {/* Standalone pages (no Navbar wrapper) */}
+                <Route path="/assistant" element={<Assistant />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+                <Route path="/pharmacy/register" element={<PharmacyRegister />} />
+                <Route path="/pharmacy-admin" element={<PharmacyAdminDashboard />} />
+
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </PharmacyProvider>
         </CartProvider>
       </AuthProvider>
     </TooltipProvider>

@@ -1,0 +1,404 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Building2, User, Palette, Lock, ChevronRight, ChevronLeft, Check,
+  Upload, MapPin, Phone, Mail, FileText, Clock
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+
+/* ── Constants ────────────────────────────────────────────────────────────── */
+
+const THEMES = [
+  { key: "theme-default", name: "Ocean Blue",    color: "#2563eb" },
+  { key: "theme-emerald", name: "Forest Green",  color: "#059669" },
+  { key: "theme-crimson", name: "Crimson Red",   color: "#dc2626" },
+  { key: "theme-violet",  name: "Royal Violet",  color: "#7c3aed" },
+  { key: "theme-amber",   name: "Golden Amber",  color: "#d97706" },
+  { key: "theme-teal",    name: "Teal",          color: "#0d9488" },
+  { key: "theme-rose",    name: "Rose Pink",     color: "#e11d48" },
+  { key: "theme-indigo",  name: "Indigo",        color: "#4338ca" },
+  { key: "theme-orange",  name: "Sunset Orange", color: "#ea580c" },
+  { key: "theme-sky",     name: "Sky Blue",      color: "#0284c7" },
+];
+
+const STEPS = [
+  { icon: Building2, title: "Pharmacy Details", desc: "Basic information about your pharmacy" },
+  { icon: User,      title: "Owner & Photos",   desc: "Your info and storefront visuals" },
+  { icon: Palette,   title: "Brand Theme",      desc: "Pick your color identity" },
+  { icon: Lock,      title: "Account Setup",    desc: "Create your admin login" },
+];
+
+/* ── Form Shape ───────────────────────────────────────────────────────────── */
+
+interface FormData {
+  name: string;
+  address: string;
+  city: string;
+  province: string;
+  phone: string;
+  license_number: string;
+  operating_hours: string;
+  owner_name: string;
+  owner_photo: File | null;
+  pharmacy_photo: File | null;
+  theme_key: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+}
+
+/* ── Component ────────────────────────────────────────────────────────────── */
+
+export default function PharmacyRegister() {
+  const { toast } = useToast();
+  const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState<FormData>({
+    name: "", address: "", city: "", province: "", phone: "",
+    license_number: "", operating_hours: "",
+    owner_name: "", owner_photo: null, pharmacy_photo: null,
+    theme_key: "theme-default",
+    email: "", password: "", confirm_password: "",
+  });
+
+  const set = (field: keyof FormData, value: string | File | null) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
+
+  const canProceed = (): boolean => {
+    if (step === 0) return !!(form.name && form.address && form.city && form.province && form.phone);
+    if (step === 1) return !!form.owner_name;
+    if (step === 2) return !!form.theme_key;
+    if (step === 3) return !!(form.email && form.password && form.password.length >= 8 && form.password === form.confirm_password);
+    return false;
+  };
+
+  const handleSubmit = async () => {
+    if (form.password !== form.confirm_password) {
+      toast({ title: "Passwords don't match", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (v instanceof File) fd.append(k, v);
+        else if (v !== null && v !== undefined) fd.append(k, v as string);
+      });
+
+      const res = await fetch("/register/api/pharmacy", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+      } else {
+        toast({ title: data.message || "Registration failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Connection error. Please try again.", variant: "destructive" });
+    }
+    setSubmitting(false);
+  };
+
+  /* ── Success Screen ── */
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-hero px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-card border border-border rounded-3xl p-10 max-w-md w-full text-center shadow-xl"
+        >
+          <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-success" />
+          </div>
+          <h2 className="text-2xl font-heading font-bold mb-3">Application Submitted!</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed mb-8">
+            Your pharmacy registration is under review. Our team will verify your details within 1–2 business days and notify you at <strong>{form.email}</strong>.
+          </p>
+          <div className="space-y-3">
+            <Button asChild className="w-full bg-primary text-primary-foreground rounded-xl">
+              <Link to="/">Browse Pharmacies</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full rounded-xl">
+              <Link to="/pharmacy-admin">Go to Admin Login</Link>
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  /* ── Wizard ── */
+  return (
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4 py-24">
+      <div className="w-full max-w-2xl">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm text-primary mb-5"
+          >
+            <Building2 className="w-4 h-4" /> Join the Network
+          </motion.div>
+          <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="text-3xl font-heading font-bold text-pharmacy-dark-foreground"
+          >
+            Register Your Pharmacy
+          </motion.h1>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+            className="text-pharmacy-dark-foreground/50 text-sm mt-2"
+          >
+            Join Pakistan's trusted pharmacy network — free forever
+          </motion.p>
+        </div>
+
+        {/* Step Indicator */}
+        <div className="flex items-center justify-between mb-8 px-2">
+          {STEPS.map((s, i) => (
+            <div key={i} className="flex items-center flex-1">
+              <div className="flex flex-col items-center">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  i < step ? "bg-success text-white"
+                    : i === step ? "bg-primary text-white shadow-primary-glow"
+                    : "bg-card border border-border text-muted-foreground"
+                }`}>
+                  {i < step ? <Check className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
+                </div>
+                <p className={`text-xs mt-1 font-medium hidden sm:block ${i === step ? "text-primary" : "text-muted-foreground"}`}>
+                  {s.title}
+                </p>
+              </div>
+              {i < STEPS.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-2 rounded-full transition-all ${i < step ? "bg-success" : "bg-border"}`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Card */}
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-card border border-border rounded-3xl p-8 shadow-card-hover"
+        >
+          <h2 className="text-xl font-heading font-bold mb-1">{STEPS[step].title}</h2>
+          <p className="text-sm text-muted-foreground mb-7">{STEPS[step].desc}</p>
+
+          {/* Step 0: Pharmacy Details */}
+          {step === 0 && (
+            <div className="space-y-4">
+              <div>
+                <Label>Pharmacy Name *</Label>
+                <div className="relative mt-1">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input placeholder="e.g. Al-Shifa Pharmacy" value={form.name} onChange={(e) => set("name", e.target.value)} className="pl-10" />
+                </div>
+              </div>
+              <div>
+                <Label>Full Address *</Label>
+                <div className="relative mt-1">
+                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Textarea placeholder="Shop #, Street, Area" value={form.address} onChange={(e) => set("address", e.target.value)} className="pl-10 min-h-[72px] resize-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>City *</Label>
+                  <Input placeholder="Islamabad" value={form.city} onChange={(e) => set("city", e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Province *</Label>
+                  <Input placeholder="ICT / Punjab / Sindh..." value={form.province} onChange={(e) => set("province", e.target.value)} className="mt-1" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Phone *</Label>
+                  <div className="relative mt-1">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input placeholder="051-XXXXXXX" value={form.phone} onChange={(e) => set("phone", e.target.value)} className="pl-10" />
+                  </div>
+                </div>
+                <div>
+                  <Label>License No.</Label>
+                  <div className="relative mt-1">
+                    <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input placeholder="Optional" value={form.license_number} onChange={(e) => set("license_number", e.target.value)} className="pl-10" />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label>Operating Hours</Label>
+                <div className="relative mt-1">
+                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input placeholder="9:00 AM – 10:00 PM" value={form.operating_hours} onChange={(e) => set("operating_hours", e.target.value)} className="pl-10" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 1: Owner & Photos */}
+          {step === 1 && (
+            <div className="space-y-5">
+              <div>
+                <Label>Owner / Manager Name *</Label>
+                <div className="relative mt-1">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input placeholder="Full name" value={form.owner_name} onChange={(e) => set("owner_name", e.target.value)} className="pl-10" />
+                </div>
+              </div>
+              {/* Owner Photo */}
+              <div>
+                <Label>Owner Photo</Label>
+                <label className="mt-2 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/40 hover:bg-muted/30 transition-all">
+                  {form.owner_photo ? (
+                    <div className="flex items-center gap-3">
+                      <img src={URL.createObjectURL(form.owner_photo)} className="w-16 h-16 rounded-full object-cover" alt="" />
+                      <div>
+                        <p className="text-sm font-medium">{form.owner_photo.name}</p>
+                        <p className="text-xs text-muted-foreground">Click to change</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Upload owner photo</p>
+                      <p className="text-xs text-muted-foreground/60">JPG, PNG up to 5MB</p>
+                    </div>
+                  )}
+                  <input type="file" className="hidden" accept="image/*" onChange={(e) => set("owner_photo", e.target.files?.[0] ?? null)} />
+                </label>
+              </div>
+              {/* Pharmacy Photo */}
+              <div>
+                <Label>Pharmacy / Storefront Photo</Label>
+                <label className="mt-2 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/40 hover:bg-muted/30 transition-all">
+                  {form.pharmacy_photo ? (
+                    <div className="flex items-center gap-3">
+                      <img src={URL.createObjectURL(form.pharmacy_photo)} className="w-20 h-16 rounded-lg object-cover" alt="" />
+                      <div>
+                        <p className="text-sm font-medium">{form.pharmacy_photo.name}</p>
+                        <p className="text-xs text-muted-foreground">Click to change</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Upload pharmacy photo</p>
+                      <p className="text-xs text-muted-foreground/60">JPG, PNG up to 5MB</p>
+                    </div>
+                  )}
+                  <input type="file" className="hidden" accept="image/*" onChange={(e) => set("pharmacy_photo", e.target.files?.[0] ?? null)} />
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Theme */}
+          {step === 2 && (
+            <div>
+              <p className="text-sm text-muted-foreground mb-5">
+                Choose a color theme for your pharmacy's branded profile page.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {THEMES.map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => set("theme_key", t.key)}
+                    className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                      form.theme_key === t.key ? "scale-105 shadow-md" : "border-border hover:border-muted-foreground/40"
+                    }`}
+                    style={{ borderColor: form.theme_key === t.key ? t.color : undefined }}
+                  >
+                    <div className="w-10 h-10 rounded-lg mb-2" style={{ background: t.color }} />
+                    <p className="text-xs font-semibold">{t.name}</p>
+                    {form.theme_key === t.key && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: t.color }}>
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {form.name && (
+                <div className="mt-6 rounded-xl overflow-hidden border border-border">
+                  <div className="p-4 text-white" style={{ background: THEMES.find((t) => t.key === form.theme_key)?.color }}>
+                    <p className="font-heading font-bold">{form.name}</p>
+                    <p className="text-xs opacity-70">{form.city || "Your City"}</p>
+                  </div>
+                  <div className="p-3 bg-muted/30 text-xs text-muted-foreground">Preview of your pharmacy header</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Account */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div>
+                <Label>Email Address *</Label>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input type="email" placeholder="admin@yourpharmacy.com" value={form.email} onChange={(e) => set("email", e.target.value)} className="pl-10" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Used for your pharmacy admin login</p>
+              </div>
+              <div>
+                <Label>Password *</Label>
+                <div className="relative mt-1">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input type="password" placeholder="Min. 8 characters" value={form.password} onChange={(e) => set("password", e.target.value)} className="pl-10" minLength={8} />
+                </div>
+              </div>
+              <div>
+                <Label>Confirm Password *</Label>
+                <div className="relative mt-1">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="password" placeholder="Repeat password"
+                    value={form.confirm_password}
+                    onChange={(e) => set("confirm_password", e.target.value)}
+                    className={`pl-10 ${form.confirm_password && form.password !== form.confirm_password ? "border-destructive" : ""}`}
+                  />
+                </div>
+                {form.confirm_password && form.password !== form.confirm_password && (
+                  <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                )}
+              </div>
+              <div className="bg-muted/50 rounded-xl p-4 text-xs text-muted-foreground leading-relaxed">
+                By registering, you agree that your pharmacy will be reviewed by our admin team before going live. We'll notify you at the email provided.
+              </div>
+            </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between mt-8">
+            {step > 0 ? (
+              <Button variant="outline" onClick={() => setStep((s) => s - 1)} className="rounded-xl gap-2">
+                <ChevronLeft className="w-4 h-4" /> Back
+              </Button>
+            ) : (
+              <Button asChild variant="ghost" className="text-muted-foreground">
+                <Link to="/">Cancel</Link>
+              </Button>
+            )}
+            {step < STEPS.length - 1 ? (
+              <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()} className="bg-primary text-primary-foreground rounded-xl gap-2 px-6">
+                Continue <ChevronRight className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={!canProceed() || submitting} className="bg-primary text-primary-foreground rounded-xl gap-2 px-6">
+                {submitting ? "Submitting..." : "Submit Application"} <Check className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
