@@ -410,9 +410,9 @@ export default function PlatformHome() {
 
       {/* ── Featured Pharmacies ── */}
       {featured.length > 0 && (
-        <section className="py-20 bg-background">
+        <section className="py-12 bg-background">
           <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-10">
+            <div className="flex items-end justify-between mb-6">
               <div>
                 <span className="text-sm font-semibold text-primary tracking-wide uppercase">Featured Pharmacies</span>
                 <h2 className="text-3xl font-heading font-bold mt-2">Trusted by Thousands</h2>
