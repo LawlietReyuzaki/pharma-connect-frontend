@@ -221,7 +221,7 @@ export default function PharmacyLanding() {
         <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-end pb-10 pt-24">
           {/* Back link */}
           <Link
-            to="/"
+            to="/pharmacies"
             className="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm mb-6 transition-colors w-fit"
           >
             <ChevronLeft className="w-4 h-4" /> Back to Pharmacies
