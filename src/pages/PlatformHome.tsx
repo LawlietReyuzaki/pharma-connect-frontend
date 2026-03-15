@@ -421,11 +421,12 @@ export default function PlatformHome() {
                 <Link to="/pharmacies">View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
               </Button>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {featured.slice(0, 4).map((p) => (
+            <div className="space-y-6">
+              {featured.slice(0, 4).map((p, i) => (
                 <FeaturedPharmacyCard
                   key={p.id}
                   pharmacy={p}
+                  index={i}
                   onSelect={() => handleSelectPharmacy(p)}
                 />
               ))}
