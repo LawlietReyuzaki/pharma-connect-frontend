@@ -250,8 +250,11 @@ export default function PharmacyNetwork() {
     loadPharmacies("", "", 0, false);
     fetch("/pharmacy/api/cities")
       .then((r) => r.json())
-      .then((d) => setCities(d.cities || []))
-      .catch(() => {});
+      .then((d) => {
+        const list = d.cities || [];
+        setCities(list.length > 0 ? list : DUMMY_CITIES);
+      })
+      .catch(() => setCities(DUMMY_CITIES));
     // Auto-trigger near me if coming from landing page
     if (searchParams.get("nearme") === "1") {
       handleNearMe();
