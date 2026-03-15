@@ -302,7 +302,7 @@ export default function PlatformHome() {
                 </Button>
               </motion.div>
 
-              <motion.div variants={fadeUp} custom={4} className="flex justify-center gap-10">
+              <motion.div variants={fadeUp} custom={4} className="flex justify-center gap-8">
                 {[
                   { value: "50+", label: "Verified Pharmacies" },
                   { value: "200+", label: "Expert Doctors" },
