@@ -309,8 +309,8 @@ export default function PlatformHome() {
                   { value: "5,000+", label: "Happy Patients" },
                 ].map((stat) => (
                   <div key={stat.label}>
-                    <p className="text-3xl font-heading font-bold text-primary">{stat.value}</p>
-                    <p className="text-xs text-pharmacy-dark-foreground/40 mt-0.5">{stat.label}</p>
+                    <p className="text-2xl font-heading font-bold text-primary">{stat.value}</p>
+                    <p className="text-xs text-pharmacy-dark-foreground/40">{stat.label}</p>
                   </div>
                 ))}
               </motion.div>
