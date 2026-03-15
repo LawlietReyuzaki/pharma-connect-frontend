@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
+import { DUMMY_PHARMACIES } from "@/lib/dummyData";
 
 /* ── Types ── */
 interface PharmacyListItem {
