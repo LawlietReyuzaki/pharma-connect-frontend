@@ -242,7 +242,7 @@ export default function PlatformHome() {
   return (
     <div>
       {/* ── Hero ── */}
-      <section className="relative min-h-[92vh] flex items-center bg-gradient-hero overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center bg-gradient-hero overflow-hidden py-12">
         <div className="absolute inset-0">
           <div className="absolute top-10 right-10 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
           <div className="absolute bottom-10 left-10 w-[400px] h-[400px] rounded-full bg-info/6 blur-[100px]" />
@@ -264,7 +264,7 @@ export default function PlatformHome() {
               <motion.h1
                 variants={fadeUp}
                 custom={1}
-                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-heading font-bold leading-[1.15] mb-6 tracking-tight text-pharmacy-dark-foreground"
+                className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold leading-[1.15] mb-4 tracking-tight text-pharmacy-dark-foreground"
               >
                 Find Trusted{" "}
                 <span className="text-gradient-primary">Pharmacies</span>{" "}
@@ -276,12 +276,12 @@ export default function PlatformHome() {
               <motion.p
                 variants={fadeUp}
                 custom={2}
-                className="text-lg text-pharmacy-dark-foreground/55 max-w-xl mx-auto mb-10 leading-relaxed"
+                className="text-base text-pharmacy-dark-foreground/55 max-w-xl mx-auto mb-6 leading-relaxed"
               >
                 AI medical assistant, doctor consultations, and medicine delivery — all in one platform. Discover verified pharmacies across Pakistan.
               </motion.p>
 
-              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3 mb-8">
+              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3 mb-5">
                 <Button
                   onClick={handleEnableLocation}
                   size="lg"
@@ -302,15 +302,15 @@ export default function PlatformHome() {
                 </Button>
               </motion.div>
 
-              <motion.div variants={fadeUp} custom={4} className="flex justify-center gap-10">
+              <motion.div variants={fadeUp} custom={4} className="flex justify-center gap-8">
                 {[
                   { value: "50+", label: "Verified Pharmacies" },
                   { value: "200+", label: "Expert Doctors" },
                   { value: "5,000+", label: "Happy Patients" },
                 ].map((stat) => (
                   <div key={stat.label}>
-                    <p className="text-3xl font-heading font-bold text-primary">{stat.value}</p>
-                    <p className="text-xs text-pharmacy-dark-foreground/40 mt-0.5">{stat.label}</p>
+                    <p className="text-2xl font-heading font-bold text-primary">{stat.value}</p>
+                    <p className="text-xs text-pharmacy-dark-foreground/40">{stat.label}</p>
                   </div>
                 ))}
               </motion.div>
@@ -320,12 +320,12 @@ export default function PlatformHome() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="py-20 bg-background">
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
             <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">How It Works</motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-heading font-bold mt-3">Your Health Journey, Simplified</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mt-3 max-w-xl mx-auto">Three simple steps to better healthcare</motion.p>
+            <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-heading font-bold mt-2">Your Health Journey, Simplified</motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm">Three simple steps to better healthcare</motion.p>
           </motion.div>
           <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
@@ -358,7 +358,7 @@ export default function PlatformHome() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-8 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-center relative"
+                className="group p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-center relative"
               >
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-heading font-bold text-lg flex items-center justify-center mx-auto mb-4">
                   {s.step}
@@ -375,11 +375,11 @@ export default function PlatformHome() {
       </section>
 
       {/* ── Platform Services ── */}
-      <section className="py-20 bg-muted/40">
+      <section className="py-12 bg-muted/40">
         <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
             <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">Our Services</motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-heading font-bold mt-3">Everything You Need for Better Health</motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-heading font-bold mt-2">Everything You Need for Better Health</motion.h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
@@ -395,7 +395,7 @@ export default function PlatformHome() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                className="group p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <s.icon className="w-7 h-7 text-primary" />
@@ -410,9 +410,9 @@ export default function PlatformHome() {
 
       {/* ── Featured Pharmacies ── */}
       {featured.length > 0 && (
-        <section className="py-20 bg-background">
+        <section className="py-12 bg-background">
           <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-10">
+            <div className="flex items-end justify-between mb-6">
               <div>
                 <span className="text-sm font-semibold text-primary tracking-wide uppercase">Featured Pharmacies</span>
                 <h2 className="text-3xl font-heading font-bold mt-2">Trusted by Thousands</h2>
@@ -436,7 +436,7 @@ export default function PlatformHome() {
       )}
 
       {/* ── Platform Stats ── */}
-      <section className="py-16 bg-muted/40">
+      <section className="py-10 bg-muted/40">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -466,7 +466,7 @@ export default function PlatformHome() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-16 bg-gradient-primary">
+      <section className="py-10 bg-gradient-primary">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-6">
             <div className="text-primary-foreground">
