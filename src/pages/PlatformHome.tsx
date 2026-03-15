@@ -319,6 +319,33 @@ export default function PlatformHome() {
         </div>
       </section>
 
+      {/* ── Featured Pharmacies ── */}
+      {featured.length > 0 && (
+        <section className="py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <span className="text-sm font-semibold text-primary tracking-wide uppercase">Featured Pharmacies</span>
+                <h2 className="text-3xl font-heading font-bold mt-2">Trusted by Thousands</h2>
+              </div>
+              <Button asChild variant="ghost" className="text-primary hover:text-primary group">
+                <Link to="/pharmacies">View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
+              </Button>
+            </div>
+            <div className="space-y-6">
+              {featured.slice(0, 4).map((p, i) => (
+                <FeaturedPharmacyCard
+                  key={p.id}
+                  pharmacy={p}
+                  index={i}
+                  onSelect={() => handleSelectPharmacy(p)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── How It Works ── */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
@@ -407,33 +434,6 @@ export default function PlatformHome() {
           </div>
         </div>
       </section>
-
-      {/* ── Featured Pharmacies ── */}
-      {featured.length > 0 && (
-        <section className="py-12 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-6">
-              <div>
-                <span className="text-sm font-semibold text-primary tracking-wide uppercase">Featured Pharmacies</span>
-                <h2 className="text-3xl font-heading font-bold mt-2">Trusted by Thousands</h2>
-              </div>
-              <Button asChild variant="ghost" className="text-primary hover:text-primary group">
-                <Link to="/pharmacies">View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
-              </Button>
-            </div>
-            <div className="space-y-6">
-              {featured.slice(0, 4).map((p, i) => (
-                <FeaturedPharmacyCard
-                  key={p.id}
-                  pharmacy={p}
-                  index={i}
-                  onSelect={() => handleSelectPharmacy(p)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── Platform Stats ── */}
       <section className="py-10 bg-muted/40">
