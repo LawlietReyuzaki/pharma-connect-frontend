@@ -358,7 +358,7 @@ export default function PlatformHome() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-8 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-center relative"
+                className="group p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-center relative"
               >
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-heading font-bold text-lg flex items-center justify-center mx-auto mb-4">
                   {s.step}
