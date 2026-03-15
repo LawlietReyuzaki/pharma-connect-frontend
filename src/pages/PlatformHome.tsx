@@ -83,17 +83,20 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-/* ── Featured Pharmacy Card ── */
+/* ── Featured Pharmacy Card (full-width horizontal) ── */
 function FeaturedPharmacyCard({
   pharmacy,
   onSelect,
+  index = 0,
 }: {
   pharmacy: PharmacyListItem;
   onSelect: () => void;
+  index?: number;
 }) {
   const accent = themeAccent[pharmacy.theme_key || "theme-default"] || "#2563eb";
   const photo = pharmacyPhotoUrl(pharmacy.pharmacy_photo_path);
   const ownerPhoto = ownerPhotoUrl(pharmacy.owner_photo_path);
+  const isEven = index % 2 === 0;
 
   return (
     <motion.div
@@ -101,59 +104,101 @@ function FeaturedPharmacyCard({
       whileInView="visible"
       viewport={{ once: true }}
       variants={fadeUp}
-      custom={0}
-      className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+      custom={index}
+      className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-card-hover transition-all duration-300 cursor-pointer"
       onClick={onSelect}
     >
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={photo}
-          alt={pharmacy.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=60";
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        {ownerPhoto && (
+      <div className={`flex flex-col md:flex-row ${!isEven ? "md:flex-row-reverse" : ""}`}>
+        {/* Photo side */}
+        <div className="relative md:w-2/5 h-56 md:h-auto min-h-[220px] overflow-hidden shrink-0">
           <img
-            src={ownerPhoto}
-            alt={pharmacy.owner_name || ""}
-            className="absolute bottom-3 right-3 w-11 h-11 rounded-full border-2 border-white object-cover shadow-md"
+            src={photo}
+            alt={pharmacy.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&q=70";
+            }}
           />
-        )}
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: accent }} />
-      </div>
-      <div className="p-5">
-        <h6 className="font-heading font-bold truncate mb-0.5">{pharmacy.name}</h6>
-        {pharmacy.owner_name && (
-          <p className="text-xs text-muted-foreground mb-1.5 truncate">by {pharmacy.owner_name}</p>
-        )}
-        <p className="text-xs text-muted-foreground flex items-center gap-1 mb-3 truncate">
-          <MapPin className="w-3 h-3 shrink-0" />
-          {pharmacy.address ? `${pharmacy.address}, ` : ""}{pharmacy.city || "Pakistan"}
-        </p>
-        <div className="flex items-center gap-2 mb-4">
-          <StarRating rating={pharmacy.avg_rating || 0} />
-          <span className="text-xs font-semibold" style={{ color: accent }}>
-            {(pharmacy.avg_rating || 0).toFixed(1)}
-          </span>
-          <span className="text-xs text-muted-foreground">({pharmacy.review_count || 0})</span>
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-1 md:hidden" style={{ background: accent }} />
+          <div className={`hidden md:block absolute top-0 bottom-0 w-1 ${isEven ? "right-0" : "left-0"}`} style={{ background: accent }} />
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Stethoscope className="w-3 h-3" /> {pharmacy.doctor_count || 0} doctors
-            </span>
+
+        {/* Info side */}
+        <div className="flex-1 p-6 md:p-8 flex flex-col justify-center">
+          <div className="flex items-start gap-4 mb-4">
+            {ownerPhoto ? (
+              <img
+                src={ownerPhoto}
+                alt={pharmacy.owner_name || ""}
+                className="w-14 h-14 rounded-xl border-2 object-cover shadow-md shrink-0"
+                style={{ borderColor: accent }}
+              />
+            ) : (
+              <div
+                className="w-14 h-14 rounded-xl flex items-center justify-center text-white text-xl font-heading font-bold shrink-0"
+                style={{ background: accent }}
+              >
+                {pharmacy.name.charAt(0)}
+              </div>
+            )}
+            <div className="min-w-0">
+              <h3 className="text-xl font-heading font-bold truncate">{pharmacy.name}</h3>
+              {pharmacy.owner_name && (
+                <p className="text-sm text-muted-foreground">by {pharmacy.owner_name}</p>
+              )}
+            </div>
           </div>
-          <Button
-            size="sm"
-            className="rounded-xl text-xs h-8 px-4 text-white"
-            style={{ background: accent }}
-          >
-            View Pharmacy <ChevronRight className="w-3 h-3 ml-1" />
-          </Button>
+
+          <p className="text-sm text-muted-foreground flex items-center gap-1.5 mb-3">
+            <MapPin className="w-4 h-4 shrink-0" style={{ color: accent }} />
+            {pharmacy.address}{pharmacy.city ? `, ${pharmacy.city}` : ""}
+            {pharmacy.province ? `, ${pharmacy.province}` : ""}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            <div className="flex items-center gap-1.5">
+              <StarRating rating={pharmacy.avg_rating || 0} />
+              <span className="text-sm font-bold" style={{ color: accent }}>
+                {(pharmacy.avg_rating || 0).toFixed(1)}
+              </span>
+              <span className="text-xs text-muted-foreground">({pharmacy.review_count || 0} reviews)</span>
+            </div>
+            <span className="text-sm text-muted-foreground flex items-center gap-1">
+              <Stethoscope className="w-4 h-4" /> {pharmacy.doctor_count || 0} doctors
+            </span>
+            {pharmacy.phone && (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Phone className="w-4 h-4" /> {pharmacy.phone}
+              </span>
+            )}
+          </div>
+
+          {pharmacy.operating_hours && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-5">
+              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+              {pharmacy.operating_hours}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3 mt-auto">
+            <Button
+              size="sm"
+              className="rounded-xl text-sm h-9 px-5 text-white shadow-md"
+              style={{ background: accent }}
+            >
+              View Pharmacy <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-xl text-sm h-9 px-4 gap-1.5"
+              style={{ borderColor: `${accent}40`, color: accent }}
+            >
+              <Stethoscope className="w-3.5 h-3.5" /> Book Doctor
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>
