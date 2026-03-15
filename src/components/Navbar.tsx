@@ -228,8 +228,11 @@ export default function Navbar() {
                   <Button variant="ghost" size="sm" className="text-pharmacy-dark-foreground/70 hover:text-pharmacy-dark-foreground" onClick={() => setAuthModal("login")}>
                     Login
                   </Button>
+                  <Button asChild variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg">
+                    <Link to="/pharmacy/register">Register Pharmacy</Link>
+                  </Button>
                   <Button size="sm" className="bg-primary text-primary-foreground rounded-lg" onClick={() => setAuthModal("register")}>
-                    Register
+                    Sign Up
                   </Button>
                 </div>
               )}
