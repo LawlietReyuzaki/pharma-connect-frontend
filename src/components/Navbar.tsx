@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Shield, Stethoscope, Sun, Moon, Building2 } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Sun, Moon, Building2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,7 +25,7 @@ export default function Navbar() {
   const { pharmacy: selectedPharmacy } = usePharmacy();
   const { toast } = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authModal, setAuthModal] = useState<"login" | "register" | "doctor-login" | "admin-login" | null>(null);
+  const [authModal, setAuthModal] = useState<"login" | "register" | "pharmacy-login" | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -63,50 +63,25 @@ export default function Navbar() {
     }
   };
 
-  const handleDoctorLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePharmacyLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAuthLoading(true);
     const fd = new FormData(e.currentTarget);
     try {
-      const res = await fetch("/doctor/api/login", {
+      const res = await fetch("/pharmacy-admin/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }),
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.setItem("auth_token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.doctor));
+        localStorage.setItem("pharmacy_admin_token", data.token);
+        localStorage.setItem("pharmacy_admin", JSON.stringify(data.admin));
         setAuthModal(null);
-        toast({ title: "Welcome, Doctor!" });
-        window.location.href = "/doctor/dashboard";
+        toast({ title: `Welcome, ${data.admin.name}!` });
+        window.location.href = "/pharmacy-admin";
       } else {
-        toast({ title: "Login failed", description: data.message, variant: "destructive" });
-      }
-    } catch {
-      toast({ title: "Connection error", variant: "destructive" });
-    }
-    setAuthLoading(false);
-  };
-
-  const handleAdminLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    const fd = new FormData(e.currentTarget);
-    try {
-      const res = await fetch("/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("admin_token", data.token);
-        setAuthModal(null);
-        toast({ title: "Admin access granted" });
-        window.location.href = "/admin";
-      } else {
-        toast({ title: "Login failed", description: data.message, variant: "destructive" });
+        toast({ title: "Login failed", description: data.message || data.error, variant: "destructive" });
       }
     } catch {
       toast({ title: "Connection error", variant: "destructive" });
@@ -226,8 +201,8 @@ export default function Navbar() {
                   <Button variant="ghost" size="sm" className="text-pharmacy-dark-foreground/70 hover:text-pharmacy-dark-foreground" onClick={() => setAuthModal("login")}>
                     Login
                   </Button>
-                  <Button asChild variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg">
-                    <Link to="/pharmacy/register">Register Pharmacy</Link>
+                  <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg gap-1.5" onClick={() => setAuthModal("pharmacy-login")}>
+                    <Building2 className="w-3.5 h-3.5" /> Pharmacy Login
                   </Button>
                   <Button size="sm" className="bg-primary text-primary-foreground rounded-lg" onClick={() => setAuthModal("register")}>
                     Sign Up
@@ -281,12 +256,9 @@ export default function Navbar() {
                     </Button>
                   </div>
                 )}
-                <div className="flex gap-2 pt-2">
-                  <button onClick={() => { setAuthModal("doctor-login"); setMobileOpen(false); }} className="text-xs text-pharmacy-dark-foreground/40 hover:text-pharmacy-dark-foreground/60 flex items-center gap-1">
-                    <Stethoscope className="w-3 h-3" /> Doctor Login
-                  </button>
-                  <button onClick={() => { setAuthModal("admin-login"); setMobileOpen(false); }} className="text-xs text-pharmacy-dark-foreground/40 hover:text-pharmacy-dark-foreground/60 flex items-center gap-1">
-                    <Shield className="w-3 h-3" /> Admin
+                <div className="pt-2">
+                  <button onClick={() => { setAuthModal("pharmacy-login"); setMobileOpen(false); }} className="text-xs text-pharmacy-dark-foreground/50 hover:text-primary flex items-center gap-1 transition-colors">
+                    <Building2 className="w-3 h-3" /> Pharmacy Login
                   </button>
                 </div>
               </nav>
@@ -311,12 +283,9 @@ export default function Navbar() {
               Don't have an account?{" "}
               <button type="button" className="text-primary font-medium" onClick={() => setAuthModal("register")}>Register</button>
             </div>
-            <div className="flex justify-center gap-4 pt-2 border-t border-border">
-              <button type="button" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1" onClick={() => setAuthModal("doctor-login")}>
-                <Stethoscope className="w-3 h-3" /> Doctor Login
-              </button>
-              <button type="button" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1" onClick={() => setAuthModal("admin-login")}>
-                <Shield className="w-3 h-3" /> Admin Login
+            <div className="flex justify-center pt-2 border-t border-border">
+              <button type="button" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1" onClick={() => setAuthModal("pharmacy-login")}>
+                <Building2 className="w-3 h-3" /> Pharmacy Login
               </button>
             </div>
           </form>
@@ -344,32 +313,25 @@ export default function Navbar() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={authModal === "doctor-login"} onOpenChange={(o) => !o && setAuthModal(null)}>
+      <Dialog open={authModal === "pharmacy-login"} onOpenChange={(o) => !o && setAuthModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-heading text-xl flex items-center gap-2"><Stethoscope className="w-5 h-5 text-primary" /> Doctor Login</DialogTitle>
+            <DialogTitle className="font-heading text-xl flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-primary" /> Pharmacy Login
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleDoctorLogin} className="space-y-4">
-            <div><Label>Email</Label><Input name="email" type="email" placeholder="doctor@reddot.com" required /></div>
+          <form onSubmit={handlePharmacyLogin} className="space-y-4">
+            <div><Label>Email</Label><Input name="email" type="email" placeholder="admin@yourpharmacy.com" required /></div>
             <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
             <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
-              {authLoading ? "Signing in..." : "Doctor Sign In"}
+              {authLoading ? "Signing in..." : "Sign In to Dashboard"}
             </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={authModal === "admin-login"} onOpenChange={(o) => !o && setAuthModal(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-heading text-xl flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Admin Login</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleAdminLogin} className="space-y-4">
-            <div><Label>Email</Label><Input name="email" type="email" placeholder="admin@reddot.com" required /></div>
-            <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
-            <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
-              {authLoading ? "Signing in..." : "Admin Sign In"}
-            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              Don't have a pharmacy account?{" "}
+              <Link to="/pharmacy/register" className="text-primary font-medium" onClick={() => setAuthModal(null)}>
+                Register your pharmacy
+              </Link>
+            </p>
           </form>
         </DialogContent>
       </Dialog>
