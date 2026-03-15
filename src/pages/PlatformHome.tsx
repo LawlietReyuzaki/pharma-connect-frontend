@@ -276,7 +276,7 @@ export default function PlatformHome() {
               <motion.p
                 variants={fadeUp}
                 custom={2}
-                className="text-lg text-pharmacy-dark-foreground/55 max-w-xl mx-auto mb-10 leading-relaxed"
+                className="text-base text-pharmacy-dark-foreground/55 max-w-xl mx-auto mb-6 leading-relaxed"
               >
                 AI medical assistant, doctor consultations, and medicine delivery — all in one platform. Discover verified pharmacies across Pakistan.
               </motion.p>
