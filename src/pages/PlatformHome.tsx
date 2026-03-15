@@ -281,7 +281,7 @@ export default function PlatformHome() {
                 AI medical assistant, doctor consultations, and medicine delivery — all in one platform. Discover verified pharmacies across Pakistan.
               </motion.p>
 
-              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3 mb-8">
+              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3 mb-5">
                 <Button
                   onClick={handleEnableLocation}
                   size="lg"
