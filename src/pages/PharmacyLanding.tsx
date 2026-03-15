@@ -12,6 +12,8 @@ import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatPKR } from "@/lib/api";
+import { DUMMY_PHARMACIES, DUMMY_DOCTORS, DUMMY_REVIEWS } from "@/lib/dummyData";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
 
@@ -129,17 +131,45 @@ export default function PharmacyLanding() {
           setDoctors(d.doctors || []);
           setReviews(d.reviews || []);
         } else {
+          // Fallback to dummy data
+          const dummyMatch = DUMMY_PHARMACIES.find(p => p.slug === slug);
+          if (dummyMatch) {
+            const pharmacyInfo: PharmacyInfo = { ...dummyMatch };
+            setPharmacy(pharmacyInfo);
+            selectPharmacy(pharmacyInfo);
+            setDoctors(DUMMY_DOCTORS as Doctor[]);
+            setReviews(DUMMY_REVIEWS as Review[]);
+          } else {
+            setNotFound(true);
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback to dummy data
+        const dummyMatch = DUMMY_PHARMACIES.find(p => p.slug === slug);
+        if (dummyMatch) {
+          const pharmacyInfo: PharmacyInfo = { ...dummyMatch };
+          setPharmacy(pharmacyInfo);
+          selectPharmacy(pharmacyInfo);
+          setDoctors(DUMMY_DOCTORS as Doctor[]);
+          setReviews(DUMMY_REVIEWS as Review[]);
+        } else {
           setNotFound(true);
         }
       })
-      .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
 
-    // Also fetch medicines (shared catalog for now)
-    fetch("/api/store/medicines?limit=8&status=in_stock")
-      .then((r) => r.json())
-      .then((d) => setMedicines(d.medicines || []))
-      .catch(() => {});
+    // Fetch medicines from database
+    supabase
+      .from("medicines")
+      .select("id, name, chemical, price, image_path, category")
+      .eq("status", "in_stock")
+      .limit(8)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setMedicines(data);
+        }
+      });
   }, [slug, selectPharmacy]);
 
   const handleSubmitReview = async () => {

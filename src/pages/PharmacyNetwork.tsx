@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
+import { DUMMY_PHARMACIES, DUMMY_CITIES } from "@/lib/dummyData";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
 
@@ -221,10 +222,24 @@ export default function PharmacyNetwork() {
         const res = await fetch(url);
         const data = await res.json();
         const list: PharmacyListItem[] = data.pharmacies || [];
-        setPharmacies((prev) => (append ? [...prev, ...list] : list));
-        setHasMore(list.length >= PAGE_SIZE);
+        if (list.length > 0) {
+          setPharmacies((prev) => (append ? [...prev, ...list] : list));
+          setHasMore(list.length >= PAGE_SIZE);
+        } else {
+          // Fallback to dummy data
+          let dummy = [...DUMMY_PHARMACIES] as PharmacyListItem[];
+          if (q) dummy = dummy.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.city.toLowerCase().includes(q.toLowerCase()));
+          if (city) dummy = dummy.filter(p => p.city === city);
+          setPharmacies(dummy);
+          setHasMore(false);
+        }
       } catch {
-        /* ignore */
+        // Fallback to dummy data
+        let dummy = [...DUMMY_PHARMACIES] as PharmacyListItem[];
+        if (q) dummy = dummy.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.city.toLowerCase().includes(q.toLowerCase()));
+        if (city) dummy = dummy.filter(p => p.city === city);
+        setPharmacies(dummy);
+        setHasMore(false);
       }
       setLoading(false);
     },
@@ -235,8 +250,11 @@ export default function PharmacyNetwork() {
     loadPharmacies("", "", 0, false);
     fetch("/pharmacy/api/cities")
       .then((r) => r.json())
-      .then((d) => setCities(d.cities || []))
-      .catch(() => {});
+      .then((d) => {
+        const list = d.cities || [];
+        setCities(list.length > 0 ? list : DUMMY_CITIES);
+      })
+      .catch(() => setCities(DUMMY_CITIES));
     // Auto-trigger near me if coming from landing page
     if (searchParams.get("nearme") === "1") {
       handleNearMe();

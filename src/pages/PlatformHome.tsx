@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
+import { DUMMY_PHARMACIES } from "@/lib/dummyData";
 
 /* ── Types ── */
 interface PharmacyListItem {
@@ -169,8 +170,11 @@ export default function PlatformHome() {
   useEffect(() => {
     fetch("/pharmacy/api/list?limit=4&offset=0")
       .then((r) => r.json())
-      .then((d) => setFeatured(d.pharmacies || []))
-      .catch(() => {});
+      .then((d) => {
+        const list = d.pharmacies || [];
+        setFeatured(list.length > 0 ? list : DUMMY_PHARMACIES.slice(0, 4));
+      })
+      .catch(() => setFeatured(DUMMY_PHARMACIES.slice(0, 4)));
   }, []);
 
   const handleSelectPharmacy = (p: PharmacyListItem) => {
