@@ -375,11 +375,11 @@ export default function PlatformHome() {
       </section>
 
       {/* ── Platform Services ── */}
-      <section className="py-20 bg-muted/40">
+      <section className="py-12 bg-muted/40">
         <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
             <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">Our Services</motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-heading font-bold mt-3">Everything You Need for Better Health</motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-heading font-bold mt-2">Everything You Need for Better Health</motion.h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
