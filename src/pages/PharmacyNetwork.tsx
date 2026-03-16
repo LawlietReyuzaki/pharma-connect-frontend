@@ -86,12 +86,14 @@ function StarRating({ rating }: { rating: number }) {
 function pharmacyPhotoUrl(path?: string) {
   if (!path) return "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=60";
   if (path.startsWith("http")) return path;
+  if (path.startsWith("/static/")) return path;
   return `/static/uploads/pharmacies/${path}`;
 }
 
 function ownerPhotoUrl(path?: string) {
   if (!path) return null;
   if (path.startsWith("http")) return path;
+  if (path.startsWith("/static/")) return path;
   return `/static/uploads/pharmacies/${path}`;
 }
 
