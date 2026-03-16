@@ -96,7 +96,7 @@ export default function PharmacyRegister() {
       if (data.success) {
         setSubmitted(true);
       } else {
-        toast({ title: data.message || "Registration failed", variant: "destructive" });
+        toast({ title: data.error || data.message || "Registration failed", variant: "destructive" });
       }
     } catch {
       toast({ title: "Connection error. Please try again.", variant: "destructive" });
