@@ -687,7 +687,7 @@ export default function PharmacyLanding() {
           {/* ── Right Sidebar ── */}
           <div className="space-y-5">
             {/* Pharmacy Info Card */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden sticky top-36">
+            <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <div
                 className="h-2"
                 style={{ background: `linear-gradient(to right, ${theme.primary}, ${theme.primaryDark})` }}
