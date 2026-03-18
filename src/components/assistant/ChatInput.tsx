@@ -69,6 +69,9 @@ export default function ChatInput({ input, setInput, onSend, loading, listening,
         Globe = Gemini web search &nbsp;|&nbsp; Arrow = Standard AI response &nbsp;|&nbsp;
         For medical emergencies call <strong>1122</strong>
       </p>
+      <p className="text-center text-[9px] text-muted-foreground/40 mt-1.5 max-w-3xl mx-auto leading-relaxed">
+        ⚠️ This is general health information, not a medical diagnosis. For proper evaluation and treatment, please consult a qualified doctor. Red Dot Pharmacy — your trusted healthcare partner.
+      </p>
     </div>
   );
 }
