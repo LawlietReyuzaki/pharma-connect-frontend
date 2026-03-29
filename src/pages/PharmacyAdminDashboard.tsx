@@ -135,26 +135,35 @@ function StatCard({ label, value, icon: Icon, color }: {
 function LoginScreen({ onLogin }: { onLogin: (a: PharmacyAdmin, t: string) => void }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
+    setPendingEmail(null);
     const fd = new FormData(e.currentTarget);
+    const email = fd.get("email") as string;
     try {
       const res = await fetch("/pharmacy-admin/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }),
+        body: JSON.stringify({ email, password: fd.get("password") }),
       });
       const data = await res.json();
       if (data.success) {
         onLogin(data.admin, data.token);
         toast({ title: `Welcome, ${data.admin.name}!` });
+      } else if (res.status === 403) {
+        // Pharmacy exists but is pending approval
+        setPendingEmail(email);
       } else {
-        toast({ title: data.message || "Invalid credentials", variant: "destructive" });
+        // 401 wrong credentials, or other error
+        setErrorMsg(data.error || "Invalid email or password.");
       }
     } catch {
-      toast({ title: "Connection error", variant: "destructive" });
+      setErrorMsg("Connection error. Is the server running?");
     }
     setLoading(false);
   };
@@ -171,6 +180,34 @@ function LoginScreen({ onLogin }: { onLogin: (a: PharmacyAdmin, t: string) => vo
           <h1 className="text-2xl font-heading font-bold">Pharmacy Admin</h1>
           <p className="text-muted-foreground text-sm mt-1">Sign in to manage your pharmacy</p>
         </div>
+
+        {/* Pending approval banner */}
+        {pendingEmail && (
+          <div className="mb-4 rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-warning mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-warning">Application Under Review</p>
+                <p className="text-muted-foreground mt-1">
+                  Your pharmacy account (<strong>{pendingEmail}</strong>) is awaiting super admin approval.
+                  You will be able to log in once approved.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Already approved? Make sure you're using the correct email and password.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Wrong credentials error */}
+        {errorMsg && (
+          <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            {errorMsg}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label>Email</Label>

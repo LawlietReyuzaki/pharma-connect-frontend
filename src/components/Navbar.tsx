@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Sun, Moon, Building2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,6 +27,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | "pharmacy-login" | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [pharmacyLoginError, setPharmacyLoginError] = useState<string | null>(null);
+  const [pharmacyPending, setPharmacyPending] = useState<string | null>(null);
   const [userDropdown, setUserDropdown] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -66,12 +68,15 @@ export default function Navbar() {
   const handlePharmacyLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAuthLoading(true);
+    setPharmacyLoginError(null);
+    setPharmacyPending(null);
     const fd = new FormData(e.currentTarget);
+    const email = fd.get("email") as string;
     try {
       const res = await fetch("/pharmacy-admin/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }),
+        body: JSON.stringify({ email, password: fd.get("password") }),
       });
       const data = await res.json();
       if (data.success) {
@@ -80,11 +85,13 @@ export default function Navbar() {
         setAuthModal(null);
         toast({ title: `Welcome, ${data.admin.name}!` });
         window.location.href = "/pharmacy-admin";
+      } else if (res.status === 403) {
+        setPharmacyPending(email);
       } else {
-        toast({ title: "Login failed", description: data.message || data.error, variant: "destructive" });
+        setPharmacyLoginError(data.error || "Invalid email or password.");
       }
     } catch {
-      toast({ title: "Connection error", variant: "destructive" });
+      setPharmacyLoginError("Connection error. Is the server running?");
     }
     setAuthLoading(false);
   };
@@ -272,6 +279,7 @@ export default function Navbar() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl">Welcome Back</DialogTitle>
+            <DialogDescription>Sign in to your patient account.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleLogin} className="space-y-4">
             <div><Label>Email</Label><Input name="email" type="email" placeholder="you@example.com" required /></div>
@@ -296,6 +304,7 @@ export default function Navbar() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl">Create Account</DialogTitle>
+            <DialogDescription>Join Red Dot Pharmacy Network as a patient.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleRegister} className="space-y-4">
             <div><Label>Full Name</Label><Input name="name" placeholder="Your name" required /></div>
@@ -313,26 +322,55 @@ export default function Navbar() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={authModal === "pharmacy-login"} onOpenChange={(o) => !o && setAuthModal(null)}>
+      <Dialog open={authModal === "pharmacy-login"} onOpenChange={(o) => { if (!o) { setAuthModal(null); setPharmacyLoginError(null); setPharmacyPending(null); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl flex items-center gap-2">
               <Building2 className="w-5 h-5 text-primary" /> Pharmacy Login
             </DialogTitle>
+            <DialogDescription>Sign in to your pharmacy admin dashboard.</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handlePharmacyLogin} className="space-y-4">
-            <div><Label>Email</Label><Input name="email" type="email" placeholder="admin@yourpharmacy.com" required /></div>
-            <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
-            <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
-              {authLoading ? "Signing in..." : "Sign In to Dashboard"}
-            </Button>
-            <p className="text-center text-xs text-muted-foreground">
-              Don't have a pharmacy account?{" "}
-              <Link to="/pharmacy/register" className="text-primary font-medium" onClick={() => setAuthModal(null)}>
-                Register your pharmacy
-              </Link>
-            </p>
-          </form>
+
+          {/* Pending approval state */}
+          {pharmacyPending ? (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-yellow-400/40 bg-yellow-400/10 p-4 text-sm">
+                <p className="font-semibold text-yellow-600 dark:text-yellow-400 mb-1">Application Under Review</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  The account for <strong>{pharmacyPending}</strong> is awaiting super admin approval.
+                  You'll be able to sign in once your pharmacy is approved. This typically takes 1–2 business days.
+                </p>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setPharmacyPending(null)}>
+                Try a different account
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                New pharmacy?{" "}
+                <Link to="/pharmacy/register" className="text-primary font-medium" onClick={() => { setAuthModal(null); setPharmacyPending(null); }}>
+                  Register here
+                </Link>
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handlePharmacyLogin} className="space-y-4">
+              {pharmacyLoginError && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/30 px-3 py-2 text-xs text-destructive">
+                  {pharmacyLoginError}
+                </div>
+              )}
+              <div><Label>Email</Label><Input name="email" type="email" placeholder="admin@yourpharmacy.com" required /></div>
+              <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
+                {authLoading ? "Signing in..." : "Sign In to Dashboard"}
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                Don't have a pharmacy account?{" "}
+                <Link to="/pharmacy/register" className="text-primary font-medium" onClick={() => { setAuthModal(null); setPharmacyLoginError(null); }}>
+                  Register your pharmacy
+                </Link>
+              </p>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </>

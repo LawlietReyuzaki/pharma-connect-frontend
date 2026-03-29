@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Building2, User, Palette, Lock, ChevronRight, ChevronLeft, Check,
@@ -56,6 +56,7 @@ interface FormData {
 
 export default function PharmacyRegister() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -95,6 +96,14 @@ export default function PharmacyRegister() {
       const data = await res.json();
       if (data.success) {
         setSubmitted(true);
+      } else if (res.status === 409) {
+        // Email already registered — send to login with a hint
+        toast({
+          title: "Already Registered",
+          description: "This email is already associated with a pharmacy account. Please log in or check your approval status.",
+          variant: "destructive",
+        });
+        setTimeout(() => navigate("/pharmacy-admin"), 2000);
       } else {
         toast({ title: data.error || data.message || "Registration failed", variant: "destructive" });
       }
