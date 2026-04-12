@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, Filter, ShoppingCart, Eye, Package, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,11 @@ const fadeUp = {
 };
 
 export default function Shop() {
+  const [urlParams] = useSearchParams();
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [categories, setCategories] = useState<CategoryCount[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(urlParams.get("search") || "");
   const [loading, setLoading] = useState(true);
   const [detailMedicine, setDetailMedicine] = useState<Medicine | null>(null);
   const { addItem } = useCart();

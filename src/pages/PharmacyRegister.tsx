@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Building2, User, Palette, Lock, ChevronRight, ChevronLeft, Check,
-  Upload, MapPin, Phone, Mail, FileText, Clock
+  Upload, MapPin, Phone, Mail, FileText, Clock, Eye, EyeOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,8 @@ export default function PharmacyRegister() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState<FormData>({
     name: "", address: "", city: "", province: "", phone: "",
     license_number: "", operating_hours: "",
@@ -88,8 +90,10 @@ export default function PharmacyRegister() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
+        if (k === "confirm_password") return;
+        if (k === "password") { fd.append("admin_password", v as string); return; }
         if (v instanceof File) fd.append(k, v);
-        else if (v !== null && v !== undefined) fd.append(k, v as string);
+        else if (v !== null && v !== undefined && v !== "") fd.append(k, v as string);
       });
 
       const res = await fetch("/register/api/pharmacy", { method: "POST", body: fd });
@@ -243,9 +247,39 @@ export default function PharmacyRegister() {
               </div>
               <div>
                 <Label>Operating Hours</Label>
-                <div className="relative mt-1">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input placeholder="9:00 AM – 10:00 PM" value={form.operating_hours} onChange={(e) => set("operating_hours", e.target.value)} className="pl-10" />
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <select
+                      className="w-full h-10 pl-10 pr-3 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      value={form.operating_hours.split("–")[0]?.trim() || ""}
+                      onChange={(e) => {
+                        const close = form.operating_hours.split("–")[1]?.trim() || "10:00 PM";
+                        set("operating_hours", `${e.target.value} – ${close}`);
+                      }}
+                    >
+                      <option value="">Opens at...</option>
+                      {["6:00 AM","7:00 AM","8:00 AM","9:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM"].map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <select
+                      className="w-full h-10 pl-10 pr-3 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      value={form.operating_hours.split("–")[1]?.trim() || ""}
+                      onChange={(e) => {
+                        const open = form.operating_hours.split("–")[0]?.trim() || "9:00 AM";
+                        set("operating_hours", `${open} – ${e.target.value}`);
+                      }}
+                    >
+                      <option value="">Closes at...</option>
+                      {["5:00 PM","6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM","11:00 PM","12:00 AM","1:00 AM","2:00 AM"].map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
@@ -361,7 +395,10 @@ export default function PharmacyRegister() {
                 <Label>Password *</Label>
                 <div className="relative mt-1">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input type="password" placeholder="Min. 8 characters" value={form.password} onChange={(e) => set("password", e.target.value)} className="pl-10" minLength={8} />
+                  <Input type={showPassword ? "text" : "password"} placeholder="Min. 8 characters" value={form.password} onChange={(e) => set("password", e.target.value)} className="pl-10 pr-10" minLength={8} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
               <div>
@@ -369,11 +406,14 @@ export default function PharmacyRegister() {
                 <div className="relative mt-1">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    type="password" placeholder="Repeat password"
+                    type={showConfirmPassword ? "text" : "password"} placeholder="Repeat password"
                     value={form.confirm_password}
                     onChange={(e) => set("confirm_password", e.target.value)}
-                    className={`pl-10 ${form.confirm_password && form.password !== form.confirm_password ? "border-destructive" : ""}`}
+                    className={`pl-10 pr-10 ${form.confirm_password && form.password !== form.confirm_password ? "border-destructive" : ""}`}
                   />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
                 {form.confirm_password && form.password !== form.confirm_password && (
                   <p className="text-xs text-destructive mt-1">Passwords do not match</p>

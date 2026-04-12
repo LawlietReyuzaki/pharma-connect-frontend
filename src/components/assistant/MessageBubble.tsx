@@ -117,7 +117,7 @@ export default function MessageBubble({ message: msg, index: i, playingTTS, onSp
             {msg.suggested_medicines.map((med: any, j: number) => (
               <Link
                 key={j}
-                to="/shop"
+                to={`/shop?search=${encodeURIComponent(med.name || med)}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all hover:shadow-sm"
               >
                 <Pill className="w-3 h-3" /> {med.name || med}

@@ -682,7 +682,7 @@ export default function PharmacyLanding() {
           </div>
 
           {/* ── Right Sidebar ── */}
-          <div className="space-y-5">
+          <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             {/* Pharmacy Info Card */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <div

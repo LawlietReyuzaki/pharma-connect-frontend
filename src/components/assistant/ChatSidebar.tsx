@@ -13,9 +13,10 @@ interface ChatSidebarProps {
   onClose: () => void;
   sessions: Session[];
   onNewChat: () => void;
+  onLoadSession?: (sessionId: string) => void;
 }
 
-export default function ChatSidebar({ open, onClose, sessions, onNewChat }: ChatSidebarProps) {
+export default function ChatSidebar({ open, onClose, sessions, onNewChat, onLoadSession }: ChatSidebarProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -47,7 +48,7 @@ export default function ChatSidebar({ open, onClose, sessions, onNewChat }: Chat
                 <button
                   key={s.session_id}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-muted text-sm transition-all group"
-                  onClick={onClose}
+                  onClick={() => { onLoadSession?.(s.session_id); onClose(); }}
                 >
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />

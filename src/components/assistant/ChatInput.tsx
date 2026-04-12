@@ -9,9 +9,10 @@ interface ChatInputProps {
   listening: boolean;
   onToggleVoice: () => void;
   lang: "en" | "ur";
+  pharmacyName?: string;
 }
 
-export default function ChatInput({ input, setInput, onSend, loading, listening, onToggleVoice, lang }: ChatInputProps) {
+export default function ChatInput({ input, setInput, onSend, loading, listening, onToggleVoice, lang, pharmacyName }: ChatInputProps) {
   return (
     <div className="border-t border-border bg-card/80 backdrop-blur-lg px-4 py-3.5 shrink-0">
       <div className="max-w-3xl mx-auto flex items-center gap-2">
@@ -70,7 +71,7 @@ export default function ChatInput({ input, setInput, onSend, loading, listening,
         For medical emergencies call <strong>1122</strong>
       </p>
       <p className="text-center text-[9px] text-muted-foreground/40 mt-1.5 max-w-3xl mx-auto leading-relaxed">
-        ⚠️ This is general health information, not a medical diagnosis. For proper evaluation and treatment, please consult a qualified doctor. Red Dot Pharmacy — your trusted healthcare partner.
+        ⚠️ This is general health information, not a medical diagnosis. For proper evaluation and treatment, please consult a qualified doctor. {pharmacyName || "PharmaNetwork"} — your trusted healthcare partner.
       </p>
     </div>
   );

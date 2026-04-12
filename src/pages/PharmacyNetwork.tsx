@@ -356,7 +356,13 @@ export default function PharmacyNetwork() {
                 className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto"
               >
                 <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground" />
+                  <button
+                    onClick={handleSearch}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-pharmacy-dark-foreground transition-colors z-10"
+                    type="button"
+                  >
+                    <Search className="w-4.5 h-4.5" />
+                  </button>
                   <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}

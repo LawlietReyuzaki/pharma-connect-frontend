@@ -22,7 +22,7 @@
     --secondary-foreground: 222 47% 11%;
 
     --muted: 210 18% 94%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 20% 40%;
 
     --accent: 354 60% 96%;
     --accent-foreground: 354 70% 40%;
@@ -30,8 +30,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 92%;
-    --input: 214 20% 92%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
     --ring: 354 70% 54%;
 
     --radius: 0.75rem;
@@ -59,9 +59,9 @@
     --gradient-hero: linear-gradient(160deg, hsl(222, 47%, 11%) 0%, hsl(224, 40%, 18%) 50%, hsl(354, 30%, 20%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(210, 20%, 98%) 100%);
     
-    --shadow-sm: 0 1px 3px hsl(222 47% 11% / 0.04), 0 1px 2px hsl(222 47% 11% / 0.06);
-    --shadow-md: 0 4px 6px hsl(222 47% 11% / 0.04), 0 2px 4px hsl(222 47% 11% / 0.06);
-    --shadow-lg: 0 20px 50px hsl(222 47% 11% / 0.08), 0 8px 20px hsl(222 47% 11% / 0.04);
+    --shadow-sm: 0 1px 3px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.08);
+    --shadow-md: 0 4px 8px hsl(222 47% 11% / 0.06), 0 2px 4px hsl(222 47% 11% / 0.08);
+    --shadow-lg: 0 20px 50px hsl(222 47% 11% / 0.10), 0 8px 20px hsl(222 47% 11% / 0.06);
     --shadow-primary: 0 8px 30px hsl(354 70% 54% / 0.3);
 
     --font-heading: 'Space Grotesk', sans-serif;

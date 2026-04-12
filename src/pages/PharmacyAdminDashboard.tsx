@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingBag, Calendar, Stethoscope, Star, MessageSquare,
   Settings, LogOut, Lock, Mail, Menu, X, Users, ChevronRight,
-  Plus, Trash2, Check, Reply, Eye, RefreshCw, Building2, Phone, MapPin, Clock,
+  Plus, Trash2, Check, Reply, Eye, EyeOff, RefreshCw, Building2, Phone, MapPin, Clock,
   Shield, AlertCircle, Camera, Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -137,6 +137,7 @@ function LoginScreen({ onLogin }: { onLogin: (a: PharmacyAdmin, t: string) => vo
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showPwd, setShowPwd] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -220,7 +221,10 @@ function LoginScreen({ onLogin }: { onLogin: (a: PharmacyAdmin, t: string) => vo
             <Label>Password</Label>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input name="password" type="password" placeholder="••••••••" required className="pl-10" />
+              <Input name="password" type={showPwd ? "text" : "password"} placeholder="••••••••" required className="pl-10 pr-10" />
+              <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
           <Button type="submit" className="w-full bg-primary text-primary-foreground rounded-xl h-11" disabled={loading}>

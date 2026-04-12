@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Sun, Moon, Building2 } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, ChevronDown, Pill, Video, Bot, Calendar, Sun, Moon, Building2, Eye, EyeOff } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -31,6 +31,9 @@ export default function Navbar() {
   const [pharmacyPending, setPharmacyPending] = useState<string | null>(null);
   const [userDropdown, setUserDropdown] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [showLoginPwd, setShowLoginPwd] = useState(false);
+  const [showRegPwd, setShowRegPwd] = useState(false);
+  const [showPharmPwd, setShowPharmPwd] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -283,7 +286,15 @@ export default function Navbar() {
           </DialogHeader>
           <form onSubmit={handleLogin} className="space-y-4">
             <div><Label>Email</Label><Input name="email" type="email" placeholder="you@example.com" required /></div>
-            <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
+            <div>
+              <Label>Password</Label>
+              <div className="relative">
+                <Input name="password" type={showLoginPwd ? "text" : "password"} placeholder="••••••••" required />
+                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowLoginPwd(!showLoginPwd)}>
+                  {showLoginPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
             <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
               {authLoading ? "Signing in..." : "Sign In"}
             </Button>
@@ -310,7 +321,15 @@ export default function Navbar() {
             <div><Label>Full Name</Label><Input name="name" placeholder="Your name" required /></div>
             <div><Label>Email</Label><Input name="email" type="email" placeholder="you@example.com" required /></div>
             <div><Label>Phone</Label><Input name="phone" placeholder="03XX-XXXXXXX" required /></div>
-            <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required minLength={6} /></div>
+            <div>
+              <Label>Password</Label>
+              <div className="relative">
+                <Input name="password" type={showRegPwd ? "text" : "password"} placeholder="••••••••" required minLength={6} />
+                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowRegPwd(!showRegPwd)}>
+                  {showRegPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
             <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
               {authLoading ? "Creating account..." : "Create Account"}
             </Button>
@@ -359,7 +378,15 @@ export default function Navbar() {
                 </div>
               )}
               <div><Label>Email</Label><Input name="email" type="email" placeholder="admin@yourpharmacy.com" required /></div>
-              <div><Label>Password</Label><Input name="password" type="password" placeholder="••••••••" required /></div>
+              <div>
+                <Label>Password</Label>
+                <div className="relative">
+                  <Input name="password" type={showPharmPwd ? "text" : "password"} placeholder="••••••••" required />
+                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowPharmPwd(!showPharmPwd)}>
+                    {showPharmPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
               <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={authLoading}>
                 {authLoading ? "Signing in..." : "Sign In to Dashboard"}
               </Button>

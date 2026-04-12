@@ -15,6 +15,7 @@ import WelcomeScreen from "@/components/assistant/WelcomeScreen";
 import MessageBubble from "@/components/assistant/MessageBubble";
 import ChatInput from "@/components/assistant/ChatInput";
 import WikiPanel from "@/components/assistant/WikiPanel";
+import { usePharmacy } from "@/contexts/PharmacyContext";
 
 interface Message {
   role: "user" | "bot";
@@ -41,6 +42,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function Assistant() {
+  const { pharmacy } = usePharmacy();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -87,6 +89,7 @@ export default function Assistant() {
           lang,
           include_wiki: !useWebSearch,
           user_id: JSON.parse(localStorage.getItem("user") || "{}").id,
+          pharmacy_id: pharmacy?.id,
         }),
       });
       const data = await res.json();
@@ -159,6 +162,20 @@ export default function Assistant() {
         onClose={() => setSidebarOpen(false)}
         sessions={sessions}
         onNewChat={() => { setMessages([]); setSidebarOpen(false); }}
+        onLoadSession={async (sid) => {
+          try {
+            const res = await fetch(`/api/chat/history/${sid}`);
+            const data = await res.json();
+            if (data.success && data.history) {
+              const loaded: Message[] = [];
+              for (const h of data.history) {
+                loaded.push({ role: "user", content: h.message });
+                loaded.push({ role: "bot", content: h.response });
+              }
+              setMessages(loaded);
+            }
+          } catch {}
+        }}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -225,6 +242,7 @@ export default function Assistant() {
           listening={listening}
           onToggleVoice={toggleVoice}
           lang={lang}
+          pharmacyName={pharmacy?.name}
         />
       </div>
 
