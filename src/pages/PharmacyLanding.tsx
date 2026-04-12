@@ -13,7 +13,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatPKR } from "@/lib/api";
 import { DUMMY_PHARMACIES, DUMMY_DOCTORS, DUMMY_REVIEWS } from "@/lib/dummyData";
-import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
 
@@ -161,17 +160,15 @@ export default function PharmacyLanding() {
       })
       .finally(() => setLoading(false));
 
-    // Fetch medicines from database
-    supabase
-      .from("medicines")
-      .select("id, name, chemical, price, image_path, category")
-      .eq("status", "in_stock")
-      .limit(8)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          setMedicines(data);
+    // Fetch medicines from backend
+    fetch("/api/store/medicines?status=in_stock&limit=8")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.medicines && data.medicines.length > 0) {
+          setMedicines(data.medicines);
         }
-      });
+      })
+      .catch(() => {});
   }, [slug, selectPharmacy]);
 
   const handleSubmitReview = async () => {
