@@ -76,7 +76,7 @@ export default function Shop() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-hero text-pharmacy-dark-foreground py-16">
+      <section className="bg-gradient-to-r from-pharmacy-dark via-purple-900 to-pharmacy-dark text-pharmacy-dark-foreground py-16">
         <div className="container mx-auto px-4 text-center">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl sm:text-5xl font-heading font-bold mb-4">
             Medicine <span className="text-gradient-primary">Store</span>
@@ -112,7 +112,7 @@ export default function Shop() {
                 <button
                   onClick={() => setSelectedCategory("")}
                   className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    !selectedCategory ? "bg-primary text-primary-foreground shadow-primary-glow" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    !selectedCategory ? "bg-gradient-to-r from-primary to-pink-600 text-primary-foreground shadow-lg shadow-primary/50" : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   All
@@ -122,7 +122,7 @@ export default function Shop() {
                     key={cat.name}
                     onClick={() => setSelectedCategory(cat.name)}
                     className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      selectedCategory === cat.name ? "bg-primary text-primary-foreground shadow-primary-glow" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      selectedCategory === cat.name ? "bg-gradient-to-r from-primary to-pink-600 text-primary-foreground shadow-lg shadow-primary/50" : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
                     {cat.name} <span className="opacity-50 ml-1">({cat.count})</span>
@@ -162,40 +162,41 @@ export default function Shop() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i % 5}
-                  className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-card-hover transition-all duration-300"
+                  className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 card-hover"
                 >
-                  <div className="aspect-square bg-muted/50 relative overflow-hidden">
+                  <div className="aspect-square bg-gradient-to-br from-slate-200 to-slate-100 relative overflow-hidden">
                     <img
                       src={med.image_path || "/static/images/default-medicine.png"}
                       alt={med.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={medicineFallback}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                     {med.status === "out_of_stock" && (
                       <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center">
                         <span className="text-sm font-bold text-primary-foreground bg-destructive px-3 py-1 rounded-lg">Out of Stock</span>
                       </div>
                     )}
                     {med.category && (
-                      <span className="absolute top-2 left-2 text-[10px] font-bold uppercase bg-pharmacy-dark text-pharmacy-dark-foreground px-2 py-0.5 rounded-md">
+                      <span className="absolute top-2 left-2 text-[10px] font-bold uppercase bg-gradient-to-r from-primary to-pink-600 text-white px-2.5 py-1 rounded-md shadow-md">
                         {med.category}
                       </span>
                     )}
                     <button
                       onClick={() => viewDetail(med.id)}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-card"
+                      className="absolute top-2 right-2 w-9 h-9 rounded-full bg-gradient-to-r from-primary to-pink-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:shadow-xl"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="p-3.5">
-                    <h6 className="font-heading font-semibold text-sm truncate">{med.name}</h6>
-                    {med.chemical && <p className="text-[11px] text-muted-foreground truncate mt-0.5">{med.chemical}</p>}
-                    <div className="flex items-center justify-between mt-3">
+                  <div className="p-4">
+                    <h6 className="font-heading font-semibold text-sm truncate group-hover:text-primary transition-colors">{med.name}</h6>
+                    {med.chemical && <p className="text-[11px] text-muted-foreground truncate mt-1">{med.chemical}</p>}
+                    <div className="flex items-center justify-between mt-4">
                       <span className="font-heading font-bold text-primary text-sm">{formatPKR(med.price)}</span>
                       <Button
                         size="sm"
-                        className="bg-primary text-primary-foreground rounded-lg h-7 px-2.5 text-[11px]"
+                        className="bg-gradient-to-r from-primary to-pink-600 text-primary-foreground rounded-lg h-7 px-3 text-[11px] shadow-md hover:shadow-lg transition-all"
                         disabled={med.status === "out_of_stock"}
                         onClick={() => addItem({ id: med.id, name: med.name, price: med.price, image_path: med.image_path })}
                       >

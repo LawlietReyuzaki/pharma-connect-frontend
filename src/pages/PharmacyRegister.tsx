@@ -120,24 +120,24 @@ export default function PharmacyRegister() {
   /* ── Success Screen ── */
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pharmacy-dark via-purple-900/40 to-pharmacy-dark px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-card border border-border rounded-3xl p-10 max-w-md w-full text-center shadow-xl"
+          className="bg-gradient-to-br from-card to-card/50 border border-border rounded-3xl p-10 max-w-md w-full text-center shadow-2xl"
         >
-          <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-success" />
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-50 flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-emerald-600" />
           </div>
           <h2 className="text-2xl font-heading font-bold mb-3">Application Submitted!</h2>
           <p className="text-muted-foreground text-sm leading-relaxed mb-8">
             Your pharmacy registration is under review. Our team will verify your details within 1–2 business days and notify you at <strong>{form.email}</strong>.
           </p>
           <div className="space-y-3">
-            <Button asChild className="w-full bg-primary text-primary-foreground rounded-xl">
+            <Button asChild className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
               <Link to="/">Browse Pharmacies</Link>
             </Button>
-            <Button asChild variant="outline" className="w-full rounded-xl">
+            <Button asChild variant="outline" className="w-full rounded-xl border-primary text-primary hover:bg-primary/5">
               <Link to="/pharmacy-admin">Go to Admin Login</Link>
             </Button>
           </div>
@@ -148,7 +148,7 @@ export default function PharmacyRegister() {
 
   /* ── Wizard ── */
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4 py-24">
+    <div className="min-h-screen bg-gradient-to-br from-pharmacy-dark via-purple-900/40 to-pharmacy-dark flex items-center justify-center px-4 py-24">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
@@ -174,9 +174,9 @@ export default function PharmacyRegister() {
           {STEPS.map((s, i) => (
             <div key={i} className="flex items-center flex-1">
               <div className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                  i < step ? "bg-success text-white"
-                    : i === step ? "bg-primary text-white shadow-primary-glow"
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all font-semibold ${
+                  i < step ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
+                    : i === step ? "bg-gradient-to-r from-primary to-pink-600 text-white shadow-lg shadow-primary/50"
                     : "bg-card border border-border text-muted-foreground"
                 }`}>
                   {i < step ? <Check className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
@@ -197,7 +197,7 @@ export default function PharmacyRegister() {
           key={step}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-card border border-border rounded-3xl p-8 shadow-card-hover"
+          className="bg-gradient-to-br from-card via-card/50 to-card/30 border border-border/50 rounded-3xl p-8 shadow-2xl backdrop-blur-sm"
         >
           <h2 className="text-xl font-heading font-bold mb-1">{STEPS[step].title}</h2>
           <p className="text-sm text-muted-foreground mb-7">{STEPS[step].desc}</p>
@@ -348,21 +348,21 @@ export default function PharmacyRegister() {
               <p className="text-sm text-muted-foreground mb-5">
                 Choose a color theme for your pharmacy's branded profile page.
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {THEMES.map((t) => (
                   <button
                     key={t.key}
                     onClick={() => set("theme_key", t.key)}
-                    className={`relative p-4 rounded-xl border-2 text-left transition-all ${
-                      form.theme_key === t.key ? "scale-105 shadow-md" : "border-border hover:border-muted-foreground/40"
+                    className={`relative p-5 rounded-2xl border-2 text-left transition-all card-hover ${
+                      form.theme_key === t.key ? "scale-105 shadow-lg" : "border-border hover:border-muted-foreground/40 hover:shadow-md"
                     }`}
                     style={{ borderColor: form.theme_key === t.key ? t.color : undefined }}
                   >
-                    <div className="w-10 h-10 rounded-lg mb-2" style={{ background: t.color }} />
-                    <p className="text-xs font-semibold">{t.name}</p>
+                    <div className="w-12 h-12 rounded-xl mb-3 shadow-md" style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}dd)` }} />
+                    <p className="text-xs font-semibold text-foreground">{t.name}</p>
                     {form.theme_key === t.key && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: t.color }}>
-                        <Check className="w-3 h-3 text-white" />
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-lg" style={{ background: t.color }}>
+                        <Check className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}
                   </button>

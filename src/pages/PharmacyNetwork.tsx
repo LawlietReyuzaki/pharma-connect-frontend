@@ -374,7 +374,7 @@ export default function PharmacyNetwork() {
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="bg-primary text-primary-foreground h-12 px-7 rounded-xl shadow-primary-glow shrink-0"
+                  className="bg-gradient-to-r from-primary to-pink-600 text-primary-foreground h-12 px-7 rounded-xl shadow-lg shadow-primary/50 shrink-0 font-semibold hover:shadow-xl transition-all"
                 >
                   <Search className="w-4 h-4 mr-2" /> Search
                 </Button>
@@ -414,7 +414,7 @@ export default function PharmacyNetwork() {
 
       {/* ── Nearby Pharmacies ── */}
       {nearby.length > 0 && (
-        <section className="py-16 bg-muted/40">
+        <section className="py-16 bg-gradient-to-b from-muted/40 to-background">
           <div className="container mx-auto px-4">
             <div className="flex items-end justify-between mb-8">
               <div>

@@ -101,12 +101,12 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-pharmacy-dark backdrop-blur-xl border-b border-pharmacy-dark-foreground/10">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pharmacy-dark via-pharmacy-dark to-pharmacy-dark/95 backdrop-blur-xl border-b border-pharmacy-dark-foreground/20 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-primary-glow transition-transform group-hover:scale-105">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-pink-600 flex items-center justify-center shadow-primary-glow transition-all group-hover:scale-110 group-hover:shadow-2xl">
                 <span className="text-primary-foreground font-heading font-bold text-sm">PN</span>
               </div>
               <div className="hidden sm:block">
@@ -214,7 +214,7 @@ export default function Navbar() {
                   <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg gap-1.5" onClick={() => setAuthModal("pharmacy-login")}>
                     <Building2 className="w-3.5 h-3.5" /> Pharmacy Login
                   </Button>
-                  <Button size="sm" className="bg-primary text-primary-foreground rounded-lg" onClick={() => setAuthModal("register")}>
+                  <Button size="sm" className="bg-gradient-to-r from-primary to-pink-600 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all" onClick={() => setAuthModal("register")}>
                     Sign Up
                   </Button>
                 </div>

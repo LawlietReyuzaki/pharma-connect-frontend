@@ -3,13 +3,13 @@ import { Building2, Bot, Search, UserPlus } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-pharmacy-dark border-t border-pharmacy-dark-foreground/10">
+    <footer className="bg-gradient-to-r from-pharmacy-dark via-purple-900/30 to-pharmacy-dark border-t border-pharmacy-dark-foreground/20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <Link to="/" className="flex items-center gap-2 mb-4 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-pink-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
                 <span className="text-primary-foreground font-heading font-bold text-xs">PN</span>
               </div>
               <span className="text-pharmacy-dark-foreground font-heading font-bold">

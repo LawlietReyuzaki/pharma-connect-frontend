@@ -287,7 +287,7 @@ export default function PlatformHome() {
                 <Button
                   onClick={handleEnableLocation}
                   size="lg"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary-glow rounded-xl px-7 h-12 text-base"
+                  className="bg-gradient-to-r from-primary to-pink-600 text-primary-foreground hover:shadow-xl hover:shadow-primary/50 shadow-lg shadow-primary/30 rounded-xl px-7 h-12 text-base font-semibold transition-all"
                   disabled={locating}
                 >
                   <Navigation className={`w-4.5 h-4.5 mr-2 ${locating ? "animate-pulse" : ""}`} />
@@ -404,7 +404,7 @@ export default function PlatformHome() {
       </section>
 
       {/* ── Platform Services ── */}
-      <section className="py-12 bg-muted/40">
+      <section className="py-12 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
             <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">Our Services</motion.span>
@@ -412,10 +412,10 @@ export default function PlatformHome() {
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: Building2, title: "Pharmacy Network", desc: "Discover verified pharmacies across Pakistan with ratings and reviews", color: "from-primary/10 to-primary/5" },
-              { icon: Video, title: "Doctor Consultations", desc: "Book video appointments with qualified medical professionals", color: "from-info/10 to-info/5" },
-              { icon: Pill, title: "Medicine Delivery", desc: "Order genuine medicines and get same-day delivery to your door", color: "from-success/10 to-success/5" },
-              { icon: Bot, title: "AI Health Assistant", desc: "24/7 medical guidance in English & Urdu with voice support", color: "from-warning/10 to-warning/5" },
+              { icon: Building2, title: "Pharmacy Network", desc: "Discover verified pharmacies across Pakistan with ratings and reviews", bgColor: "from-rose-100 to-pink-50", iconColor: "#dc2626" },
+              { icon: Video, title: "Doctor Consultations", desc: "Book video appointments with qualified medical professionals", bgColor: "from-blue-100 to-cyan-50", iconColor: "#0284c7" },
+              { icon: Pill, title: "Medicine Delivery", desc: "Order genuine medicines and get same-day delivery to your door", bgColor: "from-emerald-100 to-teal-50", iconColor: "#059669" },
+              { icon: Bot, title: "AI Health Assistant", desc: "24/7 medical guidance in English & Urdu with voice support", bgColor: "from-violet-100 to-purple-50", iconColor: "#7c3aed" },
             ].map((s, i) => (
               <motion.div
                 key={s.title}
@@ -424,10 +424,10 @@ export default function PlatformHome() {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                className="group p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300 cursor-pointer card-hover"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <s.icon className="w-7 h-7 text-primary" />
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.bgColor} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                  <s.icon className="w-7 h-7" style={{ color: s.iconColor }} />
                 </div>
                 <h5 className="font-heading font-bold mb-2">{s.title}</h5>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
