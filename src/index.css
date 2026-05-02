@@ -1,99 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
-
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Surface & background — Stitch "Clinical Clarity" #f9f9f9 */
+    --background: 0 0% 98%;
+    --foreground: 180 5% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 180 5% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 180 5% 11%;
 
-    --primary: 354 70% 54%;
+    /* Primary — Stitch deep black #000000 */
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary — Stitch mint container #d8e5e1 with muted green-gray text */
+    --secondary: 160 22% 87%;
+    --secondary-foreground: 168 7% 38%;
 
-    --muted: 210 18% 94%;
-    --muted-foreground: 215 20% 40%;
+    /* Muted — Stitch surface-container-low #f3f3f4 */
+    --muted: 240 4% 95%;
+    --muted-foreground: 233 6% 28%;
 
-    --accent: 354 60% 96%;
-    --accent-foreground: 354 70% 40%;
+    /* Accent — Stitch secondary container mint #d8e5e1 */
+    --accent: 160 22% 87%;
+    --accent-foreground: 168 7% 38%;
 
-    --destructive: 0 84% 60%;
+    /* Error — Stitch #ba1a1a */
+    --destructive: 0 75% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 88%;
-    --input: 214 20% 88%;
-    --ring: 354 70% 54%;
+    /* Borders — Stitch outline-variant #c6c6cd */
+    --border: 231 8% 79%;
+    --input: 231 8% 79%;
+    --ring: 0 0% 0%;
 
-    --radius: 0.75rem;
+    /* Larger radii per Stitch design (cards 16-24px, buttons pill) */
+    --radius: 1rem;
 
-    --sidebar-background: 220 20% 97%;
-    --sidebar-foreground: 222 47% 20%;
-    --sidebar-primary: 354 70% 54%;
+    --sidebar-background: 240 4% 95%;
+    --sidebar-foreground: 180 5% 11%;
+    --sidebar-primary: 0 0% 0%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 20% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 20% 92%;
-    --sidebar-ring: 354 70% 54%;
+    --sidebar-accent: 160 22% 87%;
+    --sidebar-accent-foreground: 168 7% 38%;
+    --sidebar-border: 231 8% 79%;
+    --sidebar-ring: 0 0% 0%;
 
-    /* Custom tokens */
-    --pharmacy-dark: 222 47% 11%;
-    --pharmacy-dark-foreground: 210 20% 98%;
-    --success: 160 60% 45%;
+    /* Custom tokens — pharmacy-dark now uses Stitch primary-container #131b2e */
+    --pharmacy-dark: 222 39% 13%;
+    --pharmacy-dark-foreground: 0 0% 98%;
+    --success: 160 60% 30%;
     --success-foreground: 0 0% 100%;
-    --warning: 43 96% 56%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(354, 70%, 54%), hsl(340, 82%, 46%));
-    --gradient-secondary: linear-gradient(135deg, hsl(217, 91%, 60%), hsl(217, 100%, 50%));
-    --gradient-accent: linear-gradient(135deg, hsl(280, 85%, 65%), hsl(340, 82%, 56%));
-    --gradient-hero: linear-gradient(160deg, hsl(222, 47%, 11%) 0%, hsl(224, 40%, 18%) 50%, hsl(354, 30%, 20%) 100%);
-    --gradient-hero-alt: linear-gradient(135deg, hsl(280, 85%, 65%) 0%, hsl(354, 70%, 54%) 50%, hsl(217, 91%, 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(210, 20%, 98%) 100%);
-    --gradient-card-premium: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(280, 100%, 97%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(160, 60%, 45%), hsl(140, 70%, 35%));
-    --gradient-warning: linear-gradient(135deg, hsl(43, 96%, 56%), hsl(33, 100%, 46%));
-    
-    --shadow-sm: 0 1px 3px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.08);
-    --shadow-md: 0 4px 8px hsl(222 47% 11% / 0.06), 0 2px 4px hsl(222 47% 11% / 0.08);
-    --shadow-lg: 0 20px 50px hsl(222 47% 11% / 0.10), 0 8px 20px hsl(222 47% 11% / 0.06);
-    --shadow-primary: 0 8px 30px hsl(354 70% 54% / 0.3);
+    /* Gradients — restrained, Stitch-aligned (deep navy + mint accents) */
+    --gradient-primary: linear-gradient(135deg, hsl(0, 0%, 0%), hsl(222, 39%, 13%));
+    --gradient-secondary: linear-gradient(135deg, hsl(222, 39%, 13%), hsl(217, 60%, 30%));
+    --gradient-accent: linear-gradient(135deg, hsl(160, 22%, 87%), hsl(168, 30%, 75%));
+    --gradient-hero: linear-gradient(160deg, hsl(222, 39%, 13%) 0%, hsl(222, 30%, 18%) 50%, hsl(168, 25%, 20%) 100%);
+    --gradient-hero-alt: linear-gradient(135deg, hsl(160, 22%, 87%) 0%, hsl(0, 0%, 98%) 50%, hsl(231, 30%, 92%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(0, 0%, 98%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(160, 22%, 95%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(160, 60%, 30%), hsl(150, 65%, 22%));
+    --gradient-warning: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(28, 95%, 42%));
 
-    --font-heading: 'Space Grotesk', sans-serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
+    /* Shadows — ultra-diffused, low-opacity navy tint per Stitch "Ambient Shadows" */
+    --shadow-sm: 0 1px 3px hsl(222 39% 13% / 0.04), 0 1px 2px hsl(222 39% 13% / 0.03);
+    --shadow-md: 0 4px 16px hsl(222 39% 13% / 0.05), 0 2px 6px hsl(222 39% 13% / 0.03);
+    --shadow-lg: 0 24px 60px hsl(222 39% 13% / 0.08), 0 10px 24px hsl(222 39% 13% / 0.04);
+    --shadow-primary: 0 8px 30px hsl(222 39% 13% / 0.18);
+
+    --font-heading: 'Public Sans', sans-serif;
+    --font-body: 'Public Sans', sans-serif;
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 20% 96%;
-    --card: 222 40% 9%;
-    --card-foreground: 210 20% 96%;
-    --popover: 222 40% 9%;
-    --popover-foreground: 210 20% 96%;
-    --primary: 354 70% 58%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 210 20% 96%;
-    --muted: 222 30% 14%;
-    --muted-foreground: 215 20% 60%;
-    --accent: 354 40% 14%;
-    --accent-foreground: 354 70% 70%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 30% 16%;
-    --input: 222 30% 16%;
-    --ring: 354 70% 58%;
+    /* Calm dark mode anchored on Stitch primary-container #131b2e */
+    --background: 222 39% 9%;
+    --foreground: 0 0% 96%;
+    --card: 222 30% 12%;
+    --card-foreground: 0 0% 96%;
+    --popover: 222 30% 12%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 222 25% 18%;
+    --secondary-foreground: 160 22% 87%;
+    --muted: 222 20% 16%;
+    --muted-foreground: 215 10% 70%;
+    --accent: 168 25% 20%;
+    --accent-foreground: 160 22% 87%;
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 222 25% 20%;
+    --input: 222 25% 20%;
+    --ring: 0 0% 80%;
   }
 }
 
@@ -105,10 +116,20 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h1 {
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
 }
 
@@ -145,11 +166,17 @@
     box-shadow: var(--shadow-primary);
   }
 
+  /* Stitch-style glassmorphism: 80% white + 20px backdrop blur */
   .glass-card {
-    background: hsl(var(--card) / 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border) / 0.5);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .dark .glass-card {
+    background: hsl(222 30% 12% / 0.7);
+    border: 1px solid hsl(0 0% 100% / 0.08);
   }
 
   .gradient-primary {
@@ -173,7 +200,7 @@
   }
 
   .card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-hover:hover {
@@ -227,8 +254,8 @@
   }
 
   @keyframes glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.5); }
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.18); }
+    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.28); }
   }
 
   @keyframes slide-in {
@@ -251,5 +278,10 @@
 
   .animate-slide-in-up {
     animation: slide-in-up 0.4s ease-out forwards;
+  }
+
+  /* Stitch pill button utility */
+  .rounded-pill {
+    border-radius: 9999px;
   }
 }

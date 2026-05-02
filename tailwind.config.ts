@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Plus Jakarta Sans', 'sans-serif'],
+        heading: ['Public Sans', 'sans-serif'],
+        body: ['Public Sans', 'sans-serif'],
+        sans: ['Public Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -80,8 +81,11 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        xl: "calc(var(--radius) + 8px)",
+        "2xl": "calc(var(--radius) + 16px)",
+        "3xl": "calc(var(--radius) + 32px)",
       },
       keyframes: {
         "accordion-down": {

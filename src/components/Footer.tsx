@@ -1,75 +1,186 @@
 import { Link } from "react-router-dom";
-import { Building2, Bot, Search, UserPlus } from "lucide-react";
+import { Globe, Share2, ArrowRight, Linkedin, Twitter } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-pharmacy-dark via-purple-900/30 to-pharmacy-dark border-t border-pharmacy-dark-foreground/20">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+    <footer className="bg-muted/40 dark:bg-card/60 pt-20 pb-12 px-6 lg:px-10 mt-20 border-t border-border/40">
+      <div className="max-w-[1440px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
-          <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-pink-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
-                <span className="text-primary-foreground font-heading font-bold text-xs">PN</span>
-              </div>
-              <span className="text-pharmacy-dark-foreground font-heading font-bold">
-                Pharma<span className="text-primary">Network</span>
-              </span>
-            </Link>
-            <p className="text-pharmacy-dark-foreground/50 text-sm leading-relaxed">
-              Pakistan's trusted pharmacy discovery platform. Find pharmacies, consult doctors, and order medicines — all in one place.
+          <div className="col-span-1">
+            <span className="text-2xl font-bold text-foreground block mb-6 tracking-tight">
+              Red Dot Pharmacy
+            </span>
+            <p className="text-muted-foreground text-base leading-relaxed mb-8 font-light">
+              Pakistan's trusted healthcare network — connecting patients with
+              verified pharmacies, qualified doctors, and AI-driven care.
             </p>
+            <div className="flex gap-3">
+              <a
+                href="#"
+                aria-label="Website"
+                className="w-10 h-10 rounded-full bg-card flex items-center justify-center text-foreground shadow-sm hover:bg-foreground hover:text-background transition-all"
+              >
+                <Globe className="w-5 h-5" />
+              </a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="w-10 h-10 rounded-full bg-card flex items-center justify-center text-foreground shadow-sm hover:bg-foreground hover:text-background transition-all"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="w-10 h-10 rounded-full bg-card flex items-center justify-center text-foreground shadow-sm hover:bg-foreground hover:text-background transition-all"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a
+                href="#"
+                aria-label="Share"
+                className="w-10 h-10 rounded-full bg-card flex items-center justify-center text-foreground shadow-sm hover:bg-foreground hover:text-background transition-all"
+              >
+                <Share2 className="w-5 h-5" />
+              </a>
+            </div>
           </div>
 
-          {/* Platform */}
+          {/* Healthcare */}
           <div>
-            <h6 className="font-heading font-semibold text-pharmacy-dark-foreground mb-4">Platform</h6>
-            <ul className="space-y-2.5">
-              {[
-                { to: "/pharmacies", label: "Find Pharmacies", icon: Search },
-                { to: "/assistant", label: "AI Health Assistant", icon: Bot },
-                { to: "/pharmacy/register", label: "Register Pharmacy", icon: UserPlus },
-              ].map((link) => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-sm text-pharmacy-dark-foreground/50 hover:text-primary transition-colors flex items-center gap-2">
-                    <link.icon className="w-3.5 h-3.5" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+            <h5 className="font-bold mb-6 text-foreground tracking-tight">
+              Healthcare
+            </h5>
+            <ul className="space-y-4 text-muted-foreground font-light">
+              <li>
+                <Link
+                  to="/shop"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Medical Store
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/pharmacies"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Find Pharmacies
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/consultation"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Doctor Consultation
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/assistant"
+                  className="hover:text-foreground transition-colors"
+                >
+                  AI Health Assistant
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* For Pharmacies */}
+          {/* Resources */}
           <div>
-            <h6 className="font-heading font-semibold text-pharmacy-dark-foreground mb-4">For Pharmacies</h6>
-            <ul className="space-y-2.5">
-              {[
-                { to: "/pharmacy/register", label: "Join the Network" },
-                { to: "/pharmacy-admin", label: "Pharmacy Dashboard" },
-              ].map((link) => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-sm text-pharmacy-dark-foreground/50 hover:text-primary transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+            <h5 className="font-bold mb-6 text-foreground tracking-tight">
+              Resources
+            </h5>
+            <ul className="space-y-4 text-muted-foreground font-light">
+              <li>
+                <Link
+                  to="/pharmacy/register"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Register Pharmacy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/pharmacy-admin"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Pharmacy Dashboard
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Support Center
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* About */}
+          {/* Newsletter */}
           <div>
-            <h6 className="font-heading font-semibold text-pharmacy-dark-foreground mb-4">About</h6>
-            <p className="text-pharmacy-dark-foreground/50 text-sm leading-relaxed">
-              PharmaNetwork connects patients with verified pharmacies across Pakistan. Discover healthcare services, book consultations, and get medicines delivered.
+            <h5 className="font-bold mb-6 text-foreground tracking-tight">
+              Newsletter
+            </h5>
+            <p className="text-muted-foreground mb-6 text-sm font-light leading-relaxed">
+              Stay updated with the latest in healthcare innovation across our
+              network.
             </p>
+            <form className="relative" onSubmit={(e) => e.preventDefault()}>
+              <input
+                className="w-full bg-card border-0 rounded-full py-4 pl-6 pr-14 text-sm focus:ring-2 focus:ring-foreground focus:outline-none placeholder:text-muted-foreground"
+                placeholder="Your email address"
+                type="email"
+              />
+              <button
+                type="submit"
+                aria-label="Subscribe"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-foreground text-background rounded-full flex items-center justify-center hover:opacity-90 transition-all"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-pharmacy-dark-foreground/10 text-center">
-          <p className="text-xs text-pharmacy-dark-foreground/30">
-            © {new Date().getFullYear()} PharmaNetwork. All rights reserved.
+        {/* Bottom row */}
+        <div className="border-t border-border/40 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-muted-foreground text-sm font-light">
+            © {new Date().getFullYear()} Red Dot Pharmacy Network. All rights
+            reserved.
           </p>
+          <div className="flex gap-8 text-sm text-muted-foreground font-light">
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </a>
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              HIPAA Compliance
+            </a>
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Cookie Policy
+            </a>
+          </div>
         </div>
       </div>
     </footer>

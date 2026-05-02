@@ -2,14 +2,18 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Search, MapPin, Navigation, ArrowRight, Star, Building2, Stethoscope,
-  Bot, Pill, Video, ShieldCheck, Heart, Truck, Users, ChevronRight, Phone
+  ArrowRight,
+  ChevronRight,
+  Star,
+  MapPin,
+  Pill,
+  LayoutDashboard,
+  Check,
+  ShieldCheck,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { usePharmacy, PharmacyInfo } from "@/contexts/PharmacyContext";
 import { DUMMY_PHARMACIES } from "@/lib/dummyData";
 
-/* ── Types ── */
 interface PharmacyListItem {
   id: number;
   name: string;
@@ -33,186 +37,25 @@ interface PharmacyListItem {
   longitude?: number;
 }
 
-const themeAccent: Record<string, string> = {
-  "theme-default": "#2563eb",
-  "theme-emerald": "#059669",
-  "theme-crimson": "#dc2626",
-  "theme-violet": "#7c3aed",
-  "theme-amber": "#d97706",
-  "theme-teal": "#0d9488",
-  "theme-rose": "#e11d48",
-  "theme-indigo": "#4338ca",
-  "theme-orange": "#ea580c",
-  "theme-sky": "#0284c7",
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.55, ease: "easeOut" as const },
-  }),
-};
+const HERO_IMG =
+  "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=1600&q=80";
+const PATIENT_IMG =
+  "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1200&q=80";
+const INNOVATION_IMG =
+  "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80";
 
 function pharmacyPhotoUrl(path?: string) {
-  if (!path) return "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=60";
+  if (!path)
+    return "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&q=70";
   if (path.startsWith("http")) return path;
   if (path.startsWith("/static/")) return path;
   return `/static/uploads/pharmacies/${path}`;
 }
 
-function ownerPhotoUrl(path?: string) {
-  if (!path) return null;
-  if (path.startsWith("http")) return path;
-  if (path.startsWith("/static/")) return path;
-  return `/static/uploads/pharmacies/${path}`;
-}
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <span className="inline-flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <Star
-          key={n}
-          className="w-3.5 h-3.5"
-          style={{
-            color: n <= Math.round(rating) ? "#f59e0b" : "#d1d5db",
-            fill: n <= Math.round(rating) ? "#f59e0b" : "transparent",
-          }}
-        />
-      ))}
-    </span>
-  );
-}
-
-/* ── Featured Pharmacy Card (full-width horizontal) ── */
-function FeaturedPharmacyCard({
-  pharmacy,
-  onSelect,
-  index = 0,
-}: {
-  pharmacy: PharmacyListItem;
-  onSelect: () => void;
-  index?: number;
-}) {
-  const accent = themeAccent[pharmacy.theme_key || "theme-default"] || "#2563eb";
-  const photo = pharmacyPhotoUrl(pharmacy.pharmacy_photo_path);
-  const ownerPhoto = ownerPhotoUrl(pharmacy.owner_photo_path);
-  const isEven = index % 2 === 0;
-
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      variants={fadeUp}
-      custom={index}
-      className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-card-hover transition-all duration-300 cursor-pointer"
-      onClick={onSelect}
-    >
-      <div className={`flex flex-col md:flex-row ${!isEven ? "md:flex-row-reverse" : ""}`}>
-        {/* Photo side */}
-        <div className="relative md:w-2/5 h-56 md:h-auto min-h-[220px] overflow-hidden shrink-0">
-          <img
-            src={photo}
-            alt={pharmacy.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&q=70";
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/50 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-1 md:hidden" style={{ background: accent }} />
-          <div className={`hidden md:block absolute top-0 bottom-0 w-1 ${isEven ? "right-0" : "left-0"}`} style={{ background: accent }} />
-        </div>
-
-        {/* Info side */}
-        <div className="flex-1 p-6 md:p-8 flex flex-col justify-center">
-          <div className="flex items-start gap-4 mb-4">
-            {ownerPhoto ? (
-              <img
-                src={ownerPhoto}
-                alt={pharmacy.owner_name || ""}
-                className="w-14 h-14 rounded-xl border-2 object-cover shadow-md shrink-0"
-                style={{ borderColor: accent }}
-              />
-            ) : (
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-white text-xl font-heading font-bold shrink-0"
-                style={{ background: accent }}
-              >
-                {pharmacy.name.charAt(0)}
-              </div>
-            )}
-            <div className="min-w-0">
-              <h3 className="text-xl font-heading font-bold truncate">{pharmacy.name}</h3>
-              {pharmacy.owner_name && (
-                <p className="text-sm text-muted-foreground">by {pharmacy.owner_name}</p>
-              )}
-            </div>
-          </div>
-
-          <p className="text-sm text-muted-foreground flex items-center gap-1.5 mb-3">
-            <MapPin className="w-4 h-4 shrink-0" style={{ color: accent }} />
-            {pharmacy.address}{pharmacy.city ? `, ${pharmacy.city}` : ""}
-            {pharmacy.province ? `, ${pharmacy.province}` : ""}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            <div className="flex items-center gap-1.5">
-              <StarRating rating={pharmacy.avg_rating || 0} />
-              <span className="text-sm font-bold" style={{ color: accent }}>
-                {(pharmacy.avg_rating || 0).toFixed(1)}
-              </span>
-              <span className="text-xs text-muted-foreground">({pharmacy.review_count || 0} reviews)</span>
-            </div>
-            <span className="text-sm text-muted-foreground flex items-center gap-1">
-              <Stethoscope className="w-4 h-4" /> {pharmacy.doctor_count || 0} doctors
-            </span>
-            {pharmacy.phone && (
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <Phone className="w-4 h-4" /> {pharmacy.phone}
-              </span>
-            )}
-          </div>
-
-          {pharmacy.operating_hours && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-5">
-              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-              {pharmacy.operating_hours}
-            </p>
-          )}
-
-          <div className="flex items-center gap-3 mt-auto">
-            <Button
-              size="sm"
-              className="rounded-xl text-sm h-9 px-5 text-white shadow-md"
-              style={{ background: accent }}
-            >
-              View Pharmacy <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-xl text-sm h-9 px-4 gap-1.5"
-              style={{ borderColor: `${accent}40`, color: accent }}
-            >
-              <Stethoscope className="w-3.5 h-3.5" /> Book Doctor
-            </Button>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ── Main Component ── */
 export default function PlatformHome() {
   const navigate = useNavigate();
   const { selectPharmacy } = usePharmacy();
   const [featured, setFeatured] = useState<PharmacyListItem[]>([]);
-  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     fetch("/pharmacy/api/list?limit=4&offset=0")
@@ -229,273 +72,367 @@ export default function PlatformHome() {
     navigate(`/pharmacy/${p.slug}`);
   };
 
-  const handleEnableLocation = () => {
-    if (!navigator.geolocation) return;
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      () => {
-        setLocating(false);
-        navigate("/pharmacies?nearme=1");
-      },
-      () => setLocating(false)
-    );
-  };
-
   return (
-    <div>
-      {/* ── Hero ── */}
-      <section className="relative min-h-[60vh] flex items-center bg-gradient-hero overflow-hidden py-12">
-        <div className="absolute inset-0">
-          <div className="absolute top-10 right-10 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
-          <div className="absolute bottom-10 left-10 w-[400px] h-[400px] rounded-full bg-info/6 blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/3 blur-[150px]" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.div initial="hidden" animate="visible">
-              <motion.div
-                variants={fadeUp}
-                custom={0}
-                className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm text-primary mb-8 backdrop-blur-sm"
-              >
-                <Heart className="w-4 h-4 fill-primary" />
-                Pakistan's Trusted Healthcare Platform
-              </motion.div>
-
-              <motion.h1
-                variants={fadeUp}
-                custom={1}
-                className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold leading-[1.15] mb-4 tracking-tight text-pharmacy-dark-foreground"
-              >
-                Find Trusted{" "}
-                <span className="text-gradient-primary">Pharmacies</span>{" "}
-                and <span className="text-gradient-primary">Doctors</span>
-                <br />
-                Near You
-              </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                custom={2}
-                className="text-base text-pharmacy-dark-foreground/55 max-w-xl mx-auto mb-6 leading-relaxed"
-              >
-                AI medical assistant, doctor consultations, and medicine delivery — all in one platform. Discover verified pharmacies across Pakistan.
-              </motion.p>
-
-              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3 mb-5">
-                <Button
-                  onClick={handleEnableLocation}
-                  size="lg"
-                  className="bg-gradient-to-r from-primary to-pink-600 text-primary-foreground hover:shadow-xl hover:shadow-primary/50 shadow-lg shadow-primary/30 rounded-xl px-7 h-12 text-base font-semibold transition-all"
-                  disabled={locating}
+    <div className="bg-background">
+      <main className="max-w-[1440px] mx-auto">
+        {/* ── Hero Section ── */}
+        <section className="relative h-[680px] lg:h-[800px] flex items-center px-6 lg:px-10 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <img
+              src={HERO_IMG}
+              alt="Modern healthcare facility"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/10" />
+          </div>
+          <div className="relative z-10 max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="text-xs font-semibold tracking-[0.15em] text-secondary-foreground mb-5 block uppercase">
+                Redefining Clinical Serenity
+              </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.05] tracking-tight">
+                Healthcare delivered with precision and calm.
+              </h1>
+              <p className="text-lg text-muted-foreground mb-10 max-w-lg leading-relaxed font-light">
+                Experience a unified medical ecosystem designed for patients,
+                providers, and administrators. Precision technology meets
+                therapeutic design.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  to="/pharmacies"
+                  className="bg-foreground text-background px-8 py-4 rounded-full font-semibold text-base hover:scale-[1.02] transition-all"
                 >
-                  <Navigation className={`w-4.5 h-4.5 mr-2 ${locating ? "animate-pulse" : ""}`} />
-                  {locating ? "Detecting Location..." : "Enable Location"}
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-white/10 border border-white/25 text-white hover:bg-white/20 rounded-xl px-7 h-12 text-base backdrop-blur-sm"
+                  Get Started
+                </Link>
+                <Link
+                  to="/pharmacies"
+                  className="glass-card text-foreground px-8 py-4 rounded-full font-semibold text-base hover:bg-muted transition-all"
                 >
-                  <Link to="/pharmacies">
-                    <Search className="w-4.5 h-4.5 mr-2" /> Find Pharmacies Near Me
-                  </Link>
-                </Button>
-              </motion.div>
-
-              <motion.div variants={fadeUp} custom={4} className="flex justify-center gap-8">
-                {[
-                  { value: "50+", label: "Verified Pharmacies" },
-                  { value: "200+", label: "Expert Doctors" },
-                  { value: "5,000+", label: "Happy Patients" },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <p className="text-2xl font-heading font-bold text-primary">{stat.value}</p>
-                    <p className="text-xs text-pharmacy-dark-foreground/40">{stat.label}</p>
-                  </div>
-                ))}
-              </motion.div>
+                  Explore Network
+                </Link>
+              </div>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Featured Pharmacies ── */}
-      {featured.length > 0 && (
-        <section className="py-12 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-6">
-              <div>
-                <span className="text-sm font-semibold text-primary tracking-wide uppercase">Featured Pharmacies</span>
-                <h2 className="text-3xl font-heading font-bold mt-2">Trusted by Thousands</h2>
-              </div>
-              <Button asChild variant="ghost" className="text-primary hover:text-primary group">
-                <Link to="/pharmacies">View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
-              </Button>
-            </div>
-            <div className="space-y-6">
-              {featured.slice(0, 4).map((p, i) => (
-                <FeaturedPharmacyCard
-                  key={p.id}
-                  pharmacy={p}
-                  index={i}
-                  onSelect={() => handleSelectPharmacy(p)}
+        {/* ── Bento Grid: Unified Gateway ── */}
+        <section className="py-20 lg:py-24 px-6 lg:px-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4 tracking-tight">
+              A Unified Gateway for All
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto font-light text-base leading-relaxed">
+              Seamlessly access the clinical tools and personal health records
+              you need through our secure, specialized portals.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 h-auto md:h-[600px]">
+            {/* Patient Portal — Big image card */}
+            <button
+              onClick={() => navigate("/shop")}
+              className="md:col-span-7 relative group overflow-hidden rounded-[32px] bg-card shadow-2xl shadow-black/5 text-left"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src={PATIENT_IMG}
+                  alt="Patient using tablet for health management"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-              ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+              </div>
+              <div className="absolute bottom-0 left-0 p-8 lg:p-10 w-full text-white">
+                <span className="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold mb-4 inline-block tracking-wider">
+                  PATIENT PORTAL
+                </span>
+                <h3 className="text-3xl lg:text-4xl font-bold mb-3 tracking-tight">
+                  My Health, Simplified.
+                </h3>
+                <p className="text-base text-white/85 mb-6 max-w-md font-light leading-relaxed">
+                  Manage prescriptions, book appointments, and access your
+                  medical history with ease.
+                </p>
+                <span className="bg-white text-foreground px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+                  Sign In to Portal{" "}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </div>
+            </button>
+
+            {/* Right column: 2 stacked cards */}
+            <div className="md:col-span-5 flex flex-col gap-6 md:gap-8">
+              {/* Pharmacy Admin — White card */}
+              <Link
+                to="/pharmacy/register"
+                className="flex-1 relative group overflow-hidden rounded-[32px] bg-card border border-border shadow-xl"
+              >
+                <div className="p-8 lg:p-10 h-full flex flex-col">
+                  <div className="w-12 h-12 bg-secondary rounded-2xl flex items-center justify-center mb-6">
+                    <Pill className="w-6 h-6 text-secondary-foreground" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2 tracking-tight">
+                    Pharmacy Admin
+                  </h3>
+                  <p className="text-muted-foreground mb-6 font-light leading-relaxed flex-1">
+                    Efficient inventory and prescription fulfillment suite.
+                  </p>
+                  <span className="text-foreground font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                    Launch Dashboard <ChevronRight className="w-5 h-5" />
+                  </span>
+                </div>
+              </Link>
+
+              {/* Super Admin — Navy card */}
+              <Link
+                to="/admin"
+                className="flex-1 relative group overflow-hidden rounded-[32px] bg-pharmacy-dark text-white shadow-xl"
+              >
+                <div className="p-8 lg:p-10 h-full flex flex-col">
+                  <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
+                    <LayoutDashboard className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2 tracking-tight">
+                    Super Admin
+                  </h3>
+                  <p className="text-white/70 mb-6 font-light leading-relaxed flex-1">
+                    Network-wide analytics and enterprise management tools.
+                  </p>
+                  <span className="text-white font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                    Enter Suite <ChevronRight className="w-5 h-5" />
+                  </span>
+                </div>
+              </Link>
             </div>
           </div>
         </section>
-      )}
 
-      {/* ── How It Works ── */}
-      <section className="py-12 bg-background">
-        <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
-            <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">How It Works</motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-heading font-bold mt-2">Your Health Journey, Simplified</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm">Three simple steps to better healthcare</motion.p>
-          </motion.div>
-          <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              {
-                icon: Search,
-                step: "1",
-                title: "Find a Pharmacy Near You",
-                desc: "Search by location, area, or name. Use GPS to discover verified pharmacies in your neighborhood.",
-                color: "from-primary/10 to-primary/5",
-              },
-              {
-                icon: Stethoscope,
-                step: "2",
-                title: "Consult Doctors or AI Assistant",
-                desc: "Book video consultations with qualified doctors or get instant guidance from our AI health assistant in English & Urdu.",
-                color: "from-info/10 to-info/5",
-              },
-              {
-                icon: Truck,
-                step: "3",
-                title: "Get Medicines Delivered",
-                desc: "Order genuine medicines from your chosen pharmacy and receive same-day delivery right to your doorstep.",
-                color: "from-success/10 to-success/5",
-              },
-            ].map((s, i) => (
-              <motion.div
-                key={s.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-                className="group p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-center relative"
+        {/* ── Featured Pharmacies (real data) ── */}
+        {featured.length > 0 && (
+          <section className="py-20 lg:py-24 px-6 lg:px-10">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+                  Featured Pharmacies
+                </h2>
+                <p className="text-muted-foreground mt-2 font-light">
+                  Verified providers trusted by thousands across Pakistan.
+                </p>
+              </div>
+              <Link
+                to="/pharmacies"
+                className="text-foreground font-semibold flex items-center gap-1 hover:gap-2 transition-all"
               >
-                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-heading font-bold text-lg flex items-center justify-center mx-auto mb-4">
-                  {s.step}
-                </div>
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform`}>
-                  <s.icon className="w-7 h-7 text-primary" />
-                </div>
-                <h5 className="font-heading font-bold mb-2">{s.title}</h5>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                View All Pharmacies <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featured.slice(0, 4).map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handleSelectPharmacy(p)}
+                  className="group bg-card rounded-3xl border border-border overflow-hidden hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 text-left"
+                >
+                  <div className="h-44 bg-muted overflow-hidden">
+                    <img
+                      src={pharmacyPhotoUrl(p.pharmacy_photo_path)}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&q=70";
+                      }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-2 gap-2">
+                      <h4 className="font-bold text-lg text-foreground tracking-tight truncate">
+                        {p.name}
+                      </h4>
+                      <div className="flex items-center text-amber-500 gap-1 shrink-0">
+                        <Star className="w-4 h-4 fill-amber-500" />
+                        <span className="text-xs font-bold">
+                          {(p.avg_rating || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mb-4 truncate font-light">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      {p.city || "Pakistan"}
+                    </p>
+                    <span className="inline-block py-1 px-3 rounded-full bg-secondary/60 text-secondary-foreground text-[10px] font-semibold tracking-wider">
+                      VERIFIED NETWORK
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* ── Platform Services ── */}
-      <section className="py-12 bg-gradient-to-b from-background to-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
-            <motion.span variants={fadeUp} custom={0} className="text-sm font-semibold text-primary tracking-wide uppercase">Our Services</motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-heading font-bold mt-2">Everything You Need for Better Health</motion.h2>
-          </motion.div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { icon: Building2, title: "Pharmacy Network", desc: "Discover verified pharmacies across Pakistan with ratings and reviews", bgColor: "from-rose-100 to-pink-50", iconColor: "#dc2626" },
-              { icon: Video, title: "Doctor Consultations", desc: "Book video appointments with qualified medical professionals", bgColor: "from-blue-100 to-cyan-50", iconColor: "#0284c7" },
-              { icon: Pill, title: "Medicine Delivery", desc: "Order genuine medicines and get same-day delivery to your door", bgColor: "from-emerald-100 to-teal-50", iconColor: "#059669" },
-              { icon: Bot, title: "AI Health Assistant", desc: "24/7 medical guidance in English & Urdu with voice support", bgColor: "from-violet-100 to-purple-50", iconColor: "#7c3aed" },
-            ].map((s, i) => (
-              <motion.div
-                key={s.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-                className="group p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300 cursor-pointer card-hover"
-              >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.bgColor} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <s.icon className="w-7 h-7" style={{ color: s.iconColor }} />
-                </div>
-                <h5 className="font-heading font-bold mb-2">{s.title}</h5>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Platform Stats ── */}
-      <section className="py-10 bg-muted/40">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { value: "50+", label: "Verified Pharmacies", icon: Building2 },
-              { value: "10+", label: "Cities Covered", icon: MapPin },
-              { value: "200+", label: "Expert Doctors", icon: Stethoscope },
-              { value: "5,000+", label: "Happy Patients", icon: Users },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-                className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-card-hover transition-shadow"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                  <stat.icon className="w-6 h-6 text-primary" />
-                </div>
-                <p className="text-3xl font-heading font-bold text-primary">{stat.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="py-10 bg-gradient-primary">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center text-center gap-6">
-            <div className="text-primary-foreground">
-              <h3 className="text-3xl font-heading font-bold mb-3">Ready to Find Your Pharmacy?</h3>
-              <p className="text-primary-foreground/60 max-w-lg mx-auto">
-                Join thousands of patients who trust our network for quality healthcare. Browse verified pharmacies, book doctors, and order medicines — all in one place.
+        {/* ── Trusted Network Section ── */}
+        <section className="py-20 lg:py-24 px-6 lg:px-10 bg-muted/40 rounded-[48px] mx-6 lg:mx-10 mb-20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-16">
+            <div className="md:w-1/2">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6 tracking-tight">
+                Trusted by Pakistan's Leading Health Institutions
+              </h2>
+              <p className="text-lg text-muted-foreground mb-10 font-light leading-relaxed">
+                Our network connects 50+ pharmacies and 200+ doctors across
+                major cities, ensuring that quality care is accessible to
+                everyone, everywhere.
               </p>
+              <div className="grid grid-cols-2 gap-6 opacity-70 hover:opacity-100 transition-all duration-700">
+                {[
+                  "HEALTHCORP",
+                  "MEDICARE+",
+                  "WELLSPRING",
+                  "BIOTECH LABS",
+                ].map((brand) => (
+                  <div
+                    key={brand}
+                    className="h-14 bg-card/60 rounded-xl flex items-center justify-center font-bold text-muted-foreground italic tracking-wide text-sm"
+                  >
+                    {brand}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg" variant="secondary" className="rounded-xl px-8 h-12">
-                <Link to="/pharmacies">
-                  <Search className="w-4 h-4 mr-2" /> Find Pharmacies
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                className="rounded-xl px-8 h-12 bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/20"
-              >
-                <Link to="/pharmacy/register">
-                  <Building2 className="w-4 h-4 mr-2" /> Register Your Pharmacy
-                </Link>
-              </Button>
+            <div className="md:w-5/12 grid grid-cols-2 gap-5">
+              <div className="bg-card p-7 rounded-[28px] shadow-sm">
+                <div className="text-4xl font-bold text-foreground mb-2 tracking-tight">
+                  2.4M
+                </div>
+                <div className="text-muted-foreground text-sm font-light">
+                  Patient Records Secured
+                </div>
+              </div>
+              <div className="bg-card p-7 rounded-[28px] shadow-sm mt-12">
+                <div className="text-4xl font-bold text-foreground mb-2 tracking-tight">
+                  99.9%
+                </div>
+                <div className="text-muted-foreground text-sm font-light">
+                  Uptime Reliability
+                </div>
+              </div>
+              <div className="bg-card p-7 rounded-[28px] shadow-sm">
+                <div className="text-4xl font-bold text-foreground mb-2 tracking-tight">
+                  15k+
+                </div>
+                <div className="text-muted-foreground text-sm font-light">
+                  Healthcare Partners
+                </div>
+              </div>
+              <div className="bg-card p-7 rounded-[28px] shadow-sm mt-12">
+                <div className="text-4xl font-bold text-foreground mb-2 tracking-tight">
+                  24/7
+                </div>
+                <div className="text-muted-foreground text-sm font-light">
+                  Clinical Support
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ── Clinical Innovation ── */}
+        <section className="py-20 lg:py-24 px-6 lg:px-10">
+          <div className="flex flex-col md:flex-row gap-12 lg:gap-16 items-center">
+            <div className="md:w-1/2 relative">
+              <div className="aspect-square rounded-[40px] overflow-hidden bg-muted">
+                <img
+                  src={INNOVATION_IMG}
+                  alt="Modern medical innovation"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-8 -right-4 lg:-right-8 glass-card p-7 rounded-[24px] max-w-xs shadow-2xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-secondary-foreground" />
+                  </div>
+                  <span className="font-bold text-foreground tracking-tight">
+                    Verified Systems
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground font-light leading-relaxed">
+                  Our platform adheres to the highest standards for medical
+                  data security and clinical accuracy.
+                </p>
+              </div>
+            </div>
+            <div className="md:w-1/2">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-8 tracking-tight">
+                Designed for Professionals, Loved by Patients.
+              </h2>
+              <ul className="space-y-7">
+                {[
+                  {
+                    title: "Intelligent Automation",
+                    desc: "Automated prescription refills and AI-driven inventory alerts for pharmacies.",
+                  },
+                  {
+                    title: "Secure Data Vault",
+                    desc: "Enterprise-grade security ensuring patient records are accessible only to authorized personnel.",
+                  },
+                  {
+                    title: "Wellness Ecosystem",
+                    desc: "Beyond treatment — integrated tools for preventative care, consultations, and AI guidance.",
+                  },
+                ].map((item) => (
+                  <li key={item.title} className="flex gap-4">
+                    <div className="shrink-0 w-7 h-7 rounded-full bg-foreground flex items-center justify-center mt-1">
+                      <Check
+                        className="w-4 h-4 text-background"
+                        strokeWidth={3}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-foreground mb-1 tracking-tight">
+                        {item.title}
+                      </h4>
+                      <p className="text-muted-foreground font-light leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA Section ── */}
+        <section className="py-20 lg:py-24 px-6 lg:px-10">
+          <div className="bg-foreground rounded-[48px] p-12 md:p-20 text-center text-background relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/10 rounded-full blur-[100px] -ml-48 -mb-48" />
+            <h2 className="text-3xl md:text-5xl font-bold mb-10 max-w-3xl mx-auto tracking-tight leading-[1.1] relative z-10">
+              Ready to join the network of therapeutic calm?
+            </h2>
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center relative z-10">
+              <Link
+                to="/pharmacies"
+                className="bg-background text-foreground px-10 py-5 rounded-full font-semibold text-base hover:scale-105 transition-all"
+              >
+                Sign Up as a Patient
+              </Link>
+              <Link
+                to="/pharmacy/register"
+                className="bg-white/10 backdrop-blur-md border border-white/20 text-background px-10 py-5 rounded-full font-semibold text-base hover:bg-white/20 transition-all"
+              >
+                Register Your Pharmacy
+              </Link>
+            </div>
+            <p className="mt-8 text-background/60 font-light relative z-10">
+              Join thousands of patients and healthcare professionals today.
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
