@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Send, Bot, User, Mic, MicOff, Volume2, VolumeX, Globe,
   ArrowLeft, Plus, Clock, BookOpen, ExternalLink, Pill,
-  Stethoscope, Search, Heart, MessageCircle, Sparkles, X
+  Stethoscope, Search, Heart, MessageCircle, Sparkles, X,
+  FlaskConical, UserCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -34,11 +35,20 @@ interface Session {
   preview?: string;
 }
 
-const QUICK_PROMPTS = [
+const PATIENT_QUICK_PROMPTS = [
   { icon: Pill, label: "Medicine Info", prompt: "Tell me about common pain relievers and their uses" },
   { icon: Stethoscope, label: "Symptoms Check", prompt: "I have a headache and mild fever, what could it be?" },
   { icon: Heart, label: "Health Tips", prompt: "Give me 5 daily health tips for a healthy lifestyle" },
   { icon: Search, label: "Drug Interactions", prompt: "Can I take paracetamol and ibuprofen together?" },
+];
+
+const PHARMACIST_QUICK_PROMPTS = [
+  { icon: Pill, label: "Hypertension", prompt: "What medicines do we have for hypertension? What are the drug classes and alternatives?" },
+  { icon: FlaskConical, label: "Diabetes drugs", prompt: "List available diabetes medications and their classes in our stock" },
+  { icon: Search, label: "Antibiotic choice", prompt: "What antibiotics do we have for a respiratory tract infection?" },
+  { icon: Heart, label: "Pain / NSAIDs", prompt: "What pain medicines and NSAIDs are available? What if paracetamol is out of stock?" },
+  { icon: Stethoscope, label: "Acid reflux / PPI", prompt: "What do we have for acid reflux and peptic ulcer disease?" },
+  { icon: BookOpen, label: "Vitamin deficiency", prompt: "What vitamin supplements do we have — especially Vitamin D, B12, and Iron?" },
 ];
 
 export default function Assistant() {
@@ -48,6 +58,7 @@ export default function Assistant() {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const [lang, setLang] = useState<"en" | "ur">("en");
+  const [mode, setMode] = useState<"patient" | "pharmacist">("patient");
   const [sessionId] = useState(() => `session_${Date.now()}`);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -78,8 +89,15 @@ export default function Assistant() {
     setLoading(true);
 
     try {
-      // Use web-search endpoint when requested, otherwise standard medical-chat
-      const endpoint = useWebSearch ? "/api/chat/web-search" : "/api/chat/medical-chat";
+      let endpoint: string;
+      if (useWebSearch) {
+        endpoint = "/api/chat/web-search";
+      } else if (mode === "pharmacist") {
+        endpoint = "/api/chat/pharmacist-consult";
+      } else {
+        endpoint = "/api/chat/medical-chat";
+      }
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,7 +105,7 @@ export default function Assistant() {
           message: userMsg,
           session_id: sessionId,
           lang,
-          include_wiki: !useWebSearch,
+          include_wiki: !useWebSearch && mode !== "pharmacist",
           user_id: JSON.parse(localStorage.getItem("user") || "{}").id,
           pharmacy_id: pharmacy?.id,
         }),
@@ -185,6 +203,37 @@ export default function Assistant() {
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
 
+        {/* Mode toggle bar */}
+        <div className="border-b border-border/50 bg-muted/30 px-4 py-2 flex items-center gap-2">
+          <button
+            onClick={() => { setMode("patient"); setMessages([]); }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              mode === "patient"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <UserCheck className="w-3.5 h-3.5" />
+            Patient Mode
+          </button>
+          <button
+            onClick={() => { setMode("pharmacist"); setMessages([]); }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              mode === "pharmacist"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            Pharmacist Consult
+          </button>
+          {mode === "pharmacist" && (
+            <span className="ml-auto text-xs text-emerald-600 font-medium">
+              Clinical reference mode — for pharmacy staff only
+            </span>
+          )}
+        </div>
+
         {/* Messages area */}
         <div className="flex-1 overflow-y-auto relative">
           {/* Subtle pattern background */}
@@ -195,8 +244,9 @@ export default function Assistant() {
           {!hasMessages ? (
             <WelcomeScreen
               lang={lang}
-              quickPrompts={QUICK_PROMPTS}
+              quickPrompts={mode === "pharmacist" ? PHARMACIST_QUICK_PROMPTS : PATIENT_QUICK_PROMPTS}
               onPromptClick={(prompt) => sendMessage(prompt)}
+              pharmacistMode={mode === "pharmacist"}
             />
           ) : (
             <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 relative">
