@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check, ShoppingCart } from "lucide-react";
+import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check, ShoppingCart, ExternalLink, AlertTriangle, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
@@ -16,6 +16,17 @@ interface BackendMedicine {
   manufacturer?: string;
   form?: string;
   ingredients?: string;
+  substitution_type?: "exact" | "class_alternative";
+  requires_prescriber_approval?: boolean;
+}
+
+interface ImageReference {
+  condition: string;
+  distinguishing_features: string;
+  source_title: string;
+  source_url: string;
+  source_domain: string;
+  image_url?: string;
 }
 
 interface Message {
@@ -25,6 +36,10 @@ interface Message {
   suggested_medicines?: any[];
   needs_doctor?: boolean;
   flagged?: boolean;
+  red_flag?: boolean;
+  image_references?: ImageReference[];
+  cta?: { label: string; url: string } | null;
+  intent?: string;
 }
 
 interface MessageBubbleProps {
@@ -211,6 +226,20 @@ export default function MessageBubble({ message: msg, index: i, playingTTS, onSp
           </motion.div>
         )}
 
+        {/* Red-flag banner (spec FR-8 / A2) */}
+        {msg.red_flag && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs"
+          >
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <span className="text-red-700 font-semibold">
+              Possible urgent symptom. If real, call 1122 or seek emergency care immediately.
+            </span>
+          </motion.div>
+        )}
+
         {/* Medicine product cards — uses backend-enriched data (id, image_url, price, status) */}
         {msg.suggested_medicines && msg.suggested_medicines.length > 0 && (
           <div className="flex gap-2 flex-wrap pt-1">
@@ -221,6 +250,56 @@ export default function MessageBubble({ message: msg, index: i, playingTTS, onSp
               return <MedicineSuggestionCard key={normalized.id ?? j} med={normalized} />;
             })}
           </div>
+        )}
+
+        {/* Reference image cards (Phase 5) */}
+        {msg.image_references && msg.image_references.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {msg.image_references.map((ref, j) => (
+              <a
+                key={j}
+                href={ref.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md hover:border-primary/30 transition-all"
+                title={ref.distinguishing_features}
+              >
+                <div className="relative aspect-video bg-muted/40 overflow-hidden flex items-center justify-center">
+                  {ref.image_url ? (
+                    <img
+                      src={ref.image_url}
+                      alt={ref.condition}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  ) : (
+                    <ImageIcon className="w-8 h-8 text-muted-foreground/40" />
+                  )}
+                </div>
+                <div className="p-2.5 space-y-1">
+                  <p className="text-xs font-semibold text-foreground line-clamp-1">{ref.condition}</p>
+                  {ref.distinguishing_features && (
+                    <p className="text-[10px] text-muted-foreground line-clamp-2">{ref.distinguishing_features}</p>
+                  )}
+                  <div className="flex items-center gap-1 text-[10px] text-primary pt-0.5">
+                    <span className="truncate">{ref.source_domain}</span>
+                    <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* Call-to-action button (e.g. "Book a consultation" on red-flag responses) */}
+        {msg.cta && msg.cta.label && msg.cta.url && (
+          <Link
+            to={msg.cta.url}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:shadow-md hover:bg-primary/90 transition-all self-start"
+          >
+            {msg.cta.label}
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
         )}
       </div>
     </motion.div>

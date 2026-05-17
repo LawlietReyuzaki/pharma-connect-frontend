@@ -18,6 +18,15 @@ import ChatInput from "@/components/assistant/ChatInput";
 import WikiPanel from "@/components/assistant/WikiPanel";
 import { usePharmacy } from "@/contexts/PharmacyContext";
 
+interface ImageReference {
+  condition: string;
+  distinguishing_features: string;
+  source_title: string;
+  source_url: string;
+  source_domain: string;
+  image_url?: string;
+}
+
 interface Message {
   role: "user" | "bot";
   content: string;
@@ -27,6 +36,10 @@ interface Message {
   flagged?: boolean;
   grounded?: boolean;
   sources?: { title: string; url: string }[];
+  image_references?: ImageReference[];
+  cta?: { label: string; url: string } | null;
+  intent?: string;
+  red_flag?: boolean;
 }
 
 interface Session {
@@ -89,23 +102,15 @@ export default function Assistant() {
     setLoading(true);
 
     try {
-      let endpoint: string;
-      if (useWebSearch) {
-        endpoint = "/api/chat/web-search";
-      } else if (mode === "pharmacist") {
-        endpoint = "/api/chat/pharmacist-consult";
-      } else {
-        endpoint = "/api/chat/medical-chat";
-      }
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/chat/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMsg,
           session_id: sessionId,
           lang,
-          include_wiki: !useWebSearch && mode !== "pharmacist",
+          mode,
+          force_intent: useWebSearch ? "evidence" : undefined,
           user_id: JSON.parse(localStorage.getItem("user") || "{}").id,
           pharmacy_id: pharmacy?.id,
         }),
@@ -119,9 +124,13 @@ export default function Assistant() {
           wiki: data.wiki,
           suggested_medicines: data.medicines,
           needs_doctor: data.needs_doctor,
-          flagged: data.flagged,
+          flagged: data.flagged || data.red_flag,
+          red_flag: data.red_flag,
           grounded: data.grounded,
           sources: data.sources,
+          image_references: data.image_references,
+          cta: data.cta,
+          intent: data.intent,
         },
       ]);
     } catch {
@@ -142,7 +151,22 @@ export default function Assistant() {
     recognition.lang = lang === "ur" ? "ur-PK" : "en-US";
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognition.onresult = (event: any) => { setInput(event.results[0][0].transcript); setListening(false); };
+    recognition.onresult = async (event: any) => {
+      const raw = event.results[0][0].transcript || "";
+      setListening(false);
+      // Phase 6: medical-vocabulary post-correction. Soft-fail to the raw transcript.
+      try {
+        const res = await fetch("/api/chat/correct-transcript", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transcript: raw, lang }),
+        });
+        const data = await res.json();
+        setInput(data?.corrected || raw);
+      } catch {
+        setInput(raw);
+      }
+    };
     recognition.onerror = () => setListening(false);
     recognition.onend = () => setListening(false);
     recognition.start();
