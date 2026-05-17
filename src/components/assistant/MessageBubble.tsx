@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
-import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check } from "lucide-react";
+import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
+import { formatPKR, medicineFallback } from "@/lib/api";
+
+interface BackendMedicine {
+  id?: number;
+  name: string;
+  price?: number;
+  image_url?: string;
+  status?: string;
+  description_short?: string;
+  manufacturer?: string;
+  form?: string;
+  ingredients?: string;
+}
 
 interface Message {
   role: "user" | "bot";
@@ -19,6 +32,56 @@ interface MessageBubbleProps {
   playingTTS: number | null;
   onSpeak: (text: string, index: number) => void;
   onOpenWiki: (wiki: Message["wiki"]) => void;
+}
+
+function MedicineSuggestionCard({ med }: { med: BackendMedicine }) {
+  const outOfStock = med.status && med.status !== "in_stock";
+  const hasFullData = typeof med.price === "number" && med.price > 0;
+
+  if (!hasFullData) {
+    return (
+      <Link
+        to={`/shop?search=${encodeURIComponent(med.name)}`}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all hover:shadow-sm self-start"
+      >
+        <Pill className="w-3 h-3" /> {med.name}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to={`/shop?search=${encodeURIComponent(med.name)}`}
+      className="group w-36 shrink-0 rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md hover:border-primary/30 transition-all"
+      title={med.description_short || med.name}
+    >
+      <div className="relative aspect-square bg-muted/40 overflow-hidden">
+        <img
+          src={med.image_url || "/static/images/default-medicine.png"}
+          alt={med.name}
+          onError={medicineFallback}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+        />
+        {outOfStock && (
+          <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-foreground/70 text-background text-[9px] font-semibold">
+            Out of Stock
+          </span>
+        )}
+      </div>
+      <div className="p-2.5 space-y-1">
+        <p className="text-xs font-semibold text-foreground line-clamp-1">
+          {med.name}
+        </p>
+        {med.form && (
+          <p className="text-[10px] text-muted-foreground line-clamp-1">{med.form}</p>
+        )}
+        <div className="flex items-center justify-between gap-1 pt-0.5">
+          <span className="text-xs font-bold text-emerald-600">{formatPKR(med.price!)}</span>
+          <ArrowRight className="w-3 h-3 text-primary opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 const isUrdu = (text: string) => /[\u0600-\u06FF]/.test(text);
@@ -111,18 +174,15 @@ export default function MessageBubble({ message: msg, index: i, playingTTS, onSp
           </motion.div>
         )}
 
-        {/* Medicine chips */}
+        {/* Medicine product cards — uses backend-enriched data (id, image_url, price, status) */}
         {msg.suggested_medicines && msg.suggested_medicines.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {msg.suggested_medicines.map((med: any, j: number) => (
-              <Link
-                key={j}
-                to={`/shop?search=${encodeURIComponent(med.name || med)}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all hover:shadow-sm"
-              >
-                <Pill className="w-3 h-3" /> {med.name || med}
-              </Link>
-            ))}
+          <div className="flex gap-2 flex-wrap pt-1">
+            {msg.suggested_medicines.map((med: any, j: number) => {
+              const normalized: BackendMedicine = typeof med === "string"
+                ? { name: med }
+                : med;
+              return <MedicineSuggestionCard key={normalized.id ?? j} med={normalized} />;
+            })}
           </div>
         )}
       </div>
