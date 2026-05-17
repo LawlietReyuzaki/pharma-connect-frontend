@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check, ArrowRight } from "lucide-react";
+import { Bot, User, Volume2, VolumeX, BookOpen, Pill, Copy, Check, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
 import { formatPKR, medicineFallback } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
 
 interface BackendMedicine {
   id?: number;
@@ -35,7 +36,8 @@ interface MessageBubbleProps {
 }
 
 function MedicineSuggestionCard({ med }: { med: BackendMedicine }) {
-  const outOfStock = med.status && med.status !== "in_stock";
+  const { addItem } = useCart();
+  const outOfStock = !!(med.status && med.status !== "in_stock");
   const hasFullData = typeof med.price === "number" && med.price > 0;
 
   if (!hasFullData) {
@@ -49,35 +51,70 @@ function MedicineSuggestionCard({ med }: { med: BackendMedicine }) {
     );
   }
 
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (outOfStock || !med.id) return;
+    addItem({
+      id: med.id,
+      name: med.name,
+      price: med.price!,
+      image_path: med.image_url,
+    });
+  };
+
   return (
     <Link
       to={`/shop?search=${encodeURIComponent(med.name)}`}
-      className="group w-36 shrink-0 rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md hover:border-primary/30 transition-all"
+      className="group w-56 shrink-0 rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-all"
       title={med.description_short || med.name}
     >
-      <div className="relative aspect-square bg-muted/40 overflow-hidden">
+      {/* Image area with manufacturer badge */}
+      <div className="relative aspect-square bg-muted/30 overflow-hidden">
+        {med.manufacturer && (
+          <span className="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-wider">
+            {med.manufacturer}
+          </span>
+        )}
         <img
           src={med.image_url || "/static/images/default-medicine.png"}
           alt={med.name}
           onError={medicineFallback}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+          className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform"
         />
         {outOfStock && (
-          <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-foreground/70 text-background text-[9px] font-semibold">
-            Out of Stock
-          </span>
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="px-3 py-1 rounded-full bg-foreground text-background text-xs font-bold">
+              Out of Stock
+            </span>
+          </div>
         )}
       </div>
-      <div className="p-2.5 space-y-1">
-        <p className="text-xs font-semibold text-foreground line-clamp-1">
-          {med.name}
-        </p>
-        {med.form && (
-          <p className="text-[10px] text-muted-foreground line-clamp-1">{med.form}</p>
-        )}
-        <div className="flex items-center justify-between gap-1 pt-0.5">
-          <span className="text-xs font-bold text-emerald-600">{formatPKR(med.price!)}</span>
-          <ArrowRight className="w-3 h-3 text-primary opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+
+      {/* Info area */}
+      <div className="p-3 space-y-2">
+        <div className="space-y-0.5">
+          <p className="text-sm font-semibold text-foreground line-clamp-2 leading-tight">
+            {med.name}
+          </p>
+          {med.ingredients && (
+            <p className="text-[11px] text-muted-foreground line-clamp-1">
+              {med.ingredients}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <span className="text-base font-bold text-foreground">
+            {formatPKR(med.price!)}
+          </span>
+          <button
+            onClick={handleAdd}
+            disabled={outOfStock}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground text-background text-xs font-bold hover:bg-foreground/90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+          >
+            <ShoppingCart className="w-3.5 h-3.5" />
+            Add
+          </button>
         </div>
       </div>
     </Link>
